@@ -3450,7 +3450,7 @@ formdata-node@^4.3.1:
     node-domexception "1.0.0"
     web-streams-polyfill "4.0.0-beta.3"
 
-frog@^0.7.4:
+frog@latest:
   version "0.7.4"
   resolved "https://registry.yarnpkg.com/frog/-/frog-0.7.4.tgz#590e829723e5bcd43aa31fd5d050fde49ce9448f"
   integrity sha512-XAzqKF+22fWEeXots9WSpIxstV7xhLMmjAdLtaNYdEkL7jT/My9BkTjjg+H8/SWJjY3wI06C0FUkeDxJpm3fIQ==
