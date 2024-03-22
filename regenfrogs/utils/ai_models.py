@@ -63,9 +63,10 @@ class ImagePromptMixin(TimestampMixin):
         import json
 
         import requests
+        name = f"{self.IPFS_PREFIX}/{self.id}-{self.image_chosen}.jpg"
 
         pinata_metadata = {
-            "name": f"{self.IPFS_PREFIX}/{self.id}-{self.image_chosen}.jpg",
+            "name": name,
         }
         pinata_options = {
             "cidVersion": 0,
@@ -77,11 +78,10 @@ class ImagePromptMixin(TimestampMixin):
             "Authorization": f"Bearer {pinata_jwt}",
         }
         pinata_data = {
-            "file": self.chosen_image,
             "pinataMetadata": json.dumps(pinata_metadata),
             "pinataOptions": json.dumps(pinata_options),
         }
-        response = requests.post(pinata_url, data=pinata_data, headers=pinata_headers)
+        response = requests.post(pinata_url, files=[(name, self.chosen_image)], data=pinata_data, headers=pinata_headers)
         print(response.json())
         self.ipfs_hash = response.json()["IpfsHash"]
         self.save()

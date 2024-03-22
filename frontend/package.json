@@ -11,6 +11,7 @@
     "gen": "graphql-codegen"
   },
   "dependencies": {
+    "@apollo/client": "^3.9.8",
     "frog": "latest",
     "graphql": "^15.7.2",
     "hono": "^4",
