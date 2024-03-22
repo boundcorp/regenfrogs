@@ -64,6 +64,7 @@ iniconfig==2.0.0
 ipython==8.18.1
 isort==6.0.0b2
 jedi==0.19.1
+kubernetes==28.1.0
 lxml==4.9.3
 matplotlib-inline==0.1.6
 mccabe==0.7.0
