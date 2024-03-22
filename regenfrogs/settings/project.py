@@ -333,7 +333,7 @@ Q_CLUSTER = {
     "catch_up": False,
 }
 
-if "SENTRY_BACKEND_URL" in os.environ:
+if os.environ.get("SENTRY_BACKEND_URL", ""):
     import sentry_sdk
     from sentry_sdk.integrations.django import DjangoIntegration
 
