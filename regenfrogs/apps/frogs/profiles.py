@@ -28,7 +28,7 @@ SPECIES = [
     "Pickerel frog - Green or brown with rectangular spots along the back",
     "American bullfrog - Green or brown with a large, rounded body",
     "Northern leopard frog - Green or brown with circular spots along the back",
-    "Wood frog - Brown or tan with darker markings resembling a mask across the eyes"
+    "Wood frog - Brown or tan with darker markings resembling a mask across the eyes",
 ]
 
 HANDS = [

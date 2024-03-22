@@ -185,8 +185,10 @@ class ImagePromptMixin(TimestampMixin):
 
     def get_full_prompt(self):
         prompt = self.prompt
+        print("Building prompt", prompt)
         if self.references and isinstance(self.references, list):
-            prompt = " ".join(self.references) + "\n" + prompt
+            print("With references", self.references)
+            prompt = " ".join(self.references) + " " + prompt
         return prompt
 
     def on_complete(self):
@@ -204,6 +206,13 @@ class ImagePromptMixin(TimestampMixin):
 
         response = conn.getresponse()
         self.status_response = json.loads(response.read().decode("utf-8"))
+        if (
+            "errors" in self.status_response
+            and self.requested_at
+            and timezone.now() - self.requested_at > timezone.timedelta(minutes=5)
+        ):
+            print("Error loading image", self.status_response)
+            self.generation_status = ImageGenerationStatus.FAILED
         try:
             self.generation_status = self.status_response["data"]["status"]
             if self.generation_status == ImageGenerationStatus.FAILED:
