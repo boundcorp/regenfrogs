@@ -1,12 +1,9 @@
 import os
 
 from django.db import models
-from django.utils import timezone
-from django_q.models import Schedule
-from django_q.tasks import async_task
 
 from regenfrogs.utils.ai_models import ImagePromptMixin
-from regenfrogs.utils.models import TimestampMixin, MediumIDMixin
+from regenfrogs.utils.models import TimestampMixin, MediumIDMixin, UUIDMixin
 
 
 class Frog(TimestampMixin, MediumIDMixin):
@@ -15,4 +12,27 @@ class Frog(TimestampMixin, MediumIDMixin):
 
 
 class FrogImage(ImagePromptMixin, MediumIDMixin):
-    pass
+    IMPORT_NAME = "regenfrogs.apps.frogs.models.FrogImage"
+    IPFS_PREFIX = 'frogs'
+
+
+class FrogStyle(TimestampMixin, MediumIDMixin):
+    name = models.CharField(max_length=255)
+    prompt_suffix = models.CharField(max_length=255, null=True, blank=True)
+
+    def imagine(self, prompt, references=None):
+        if self.prompt_suffix:
+            prompt = f"{prompt} {self.prompt_suffix}"
+        image = FrogImage.imagine(prompt, references)
+        self.outputs.create(frog=image)
+        return image
+
+
+class FrogStyleImageReference(TimestampMixin, UUIDMixin):
+    image = models.ForeignKey('FrogImage', on_delete=models.CASCADE, related_name='image_references')
+    style = models.ForeignKey('FrogStyle', on_delete=models.CASCADE, related_name='style_references')
+
+
+class FrogStyleImageOutput(TimestampMixin, UUIDMixin):
+    image = models.ForeignKey('FrogImage', on_delete=models.CASCADE, related_name='image_outputs')
+    style = models.ForeignKey('FrogStyle', on_delete=models.CASCADE, related_name='style_outputs')
