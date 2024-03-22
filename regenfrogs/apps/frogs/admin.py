@@ -14,7 +14,10 @@ class FrogImageAdmin(ModelAdmin):
     list_display = [
         "id",
         "get_generated",
-        "prompt",
+        "get_references",
+        "species",
+        "hands",
+        "clothes",
         "generation_status",
         "requested_at",
         "completed_at",
@@ -47,6 +50,19 @@ class FrogImageAdmin(ModelAdmin):
         "choose_three",
         "choose_four",
     ]
+
+    @admin.display(description="Referenced Images")
+    def get_references(self, obj):
+        if obj.references:
+            return mark_safe(
+                '<div style="width: 600px">%s</div>'
+                % "".join(
+                    [
+                        preview_image(img, height=200, width=200)
+                        for img in obj.references
+                    ]
+                )
+            )
 
     @admin.display(description="Generated Images")
     def get_generated(self, obj):
