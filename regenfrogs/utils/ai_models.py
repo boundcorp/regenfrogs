@@ -85,7 +85,7 @@ class ImagePromptMixin(TimestampMixin):
 
         name = f"{self.IPFS_PREFIX}/"
         files = {
-            'file': (name, self.chosen_image),
+            "file": (name, self.chosen_image),
         }
 
         pinata_jwt = os.environ.get("PINATA_KEY")
