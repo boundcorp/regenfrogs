@@ -128,7 +128,8 @@ class ImagePromptMixin(TimestampMixin):
                 print("  Failed to update image status", image.id)
 
         for image in waiting[: cls.MAX_CONCURRENCY]:
-            if cls.queue_has_capacity():
+            image.refresh_from_db()
+            if cls.queue_has_capacity() and image.generation_status == ImageGenerationStatus.WAITING:
                 print("  Starting image...", image.id)
                 image.request_images()
 
