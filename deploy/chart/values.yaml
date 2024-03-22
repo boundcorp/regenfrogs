@@ -41,7 +41,7 @@ env:
   MINIO_STORAGE_MEDIA_BUCKET_NAME: assets
   MINIO_STORAGE_USE_HTTPS: false
   MINIO_STORAGE_AUTO_CREATE_MEDIA_BUCKET: true
-  MINIO_STORAGE_MEDIA_URL: "https://regenfrogs.boundcorp.net/assets"
+  MINIO_STORAGE_MEDIA_URL: "https://regenfrogs.xyz/assets"
   MINIO_STORAGE_MEDIA_USE_PRESIGNED: true
 
 
