@@ -20,8 +20,8 @@ services:
       MINIO_ROOT_USER: dev
       MINIO_ROOT_PASSWORD: test1234
       MINIO_BUCKET: ${CI_PROJECT_NAME}-assets
-    #ports: ["9000:9000", "9001:9001"]
-    expose: ["9000", "9001"]
+    ports: ["9000:9000", "9001:9001"]
+    #expose: ["9000", "9001"]
     command: minio server /data --console-address ":9001"
     volumes:
       - /data/${CI_PROJECT_NAME}/minio:/data
