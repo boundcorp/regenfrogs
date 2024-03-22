@@ -13,6 +13,7 @@ class AccountTypes(models.TextChoices):
 
 class User(TimestampMixin, MediumIDMixin, AbstractUser, MailMixin):
     account_type = models.CharField(max_length=50, choices=AccountTypes.choices, default=AccountTypes.STAFF)
+    farcaster_id = models.PositiveIntegerField(default=0)
 
     def __str__(self):
         return f"{self.get_full_name()} <{self.email}>"

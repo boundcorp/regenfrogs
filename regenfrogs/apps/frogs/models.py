@@ -13,6 +13,8 @@ class FrogImage(ImagePromptMixin, MediumIDMixin):
     IMPORT_NAME = "regenfrogs.apps.frogs.models.FrogImage"
     IPFS_PREFIX = "frogs"
 
+    style = models.ForeignKey("FrogStyle", on_delete=models.CASCADE, related_name="outputs", null=True, blank=True)
+
 
 class FrogStyle(TimestampMixin, MediumIDMixin):
     name = models.CharField(max_length=255)
@@ -29,8 +31,3 @@ class FrogStyle(TimestampMixin, MediumIDMixin):
 class FrogStyleImageReference(TimestampMixin, UUIDMixin):
     image = models.ForeignKey("FrogImage", on_delete=models.CASCADE, related_name="image_references")
     style = models.ForeignKey("FrogStyle", on_delete=models.CASCADE, related_name="style_references")
-
-
-class FrogStyleImageOutput(TimestampMixin, UUIDMixin):
-    image = models.ForeignKey("FrogImage", on_delete=models.CASCADE, related_name="image_outputs")
-    style = models.ForeignKey("FrogStyle", on_delete=models.CASCADE, related_name="style_outputs")

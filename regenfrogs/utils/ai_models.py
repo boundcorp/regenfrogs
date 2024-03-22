@@ -192,10 +192,6 @@ class ImagePromptMixin(TimestampMixin):
     def on_complete(self):
         self.completed_at = timezone.now()
         self.save()
-        character = self.avatar_for.first()
-        if character:
-            character.generating = False
-            character.save()
 
     def update_generation_status(self):
         import http.client
@@ -217,6 +213,7 @@ class ImagePromptMixin(TimestampMixin):
                 self.image_2 = download_image_for_field(self.status_response["data"]["upscaled_urls"][1])
                 self.image_3 = download_image_for_field(self.status_response["data"]["upscaled_urls"][2])
                 self.image_4 = download_image_for_field(self.status_response["data"]["upscaled_urls"][3])
+                self.on_complete()
         except:
             print("Error loading image", self.status_response)
         finally:
