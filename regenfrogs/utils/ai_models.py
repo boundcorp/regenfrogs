@@ -11,10 +11,10 @@ IMPORT_NAME = "regenfrogs.utils.ai_models"
 
 
 class ImageGenerationStatus(models.TextChoices):
-    WAITING = 'waiting'
-    PENDING = 'pending'
-    IN_PROGRESS = 'in-progress'
-    READY = 'ready'
+    WAITING = "waiting"
+    PENDING = "pending"
+    IN_PROGRESS = "in-progress"
+    READY = "ready"
 
 
 class ImagePromptMixin(TimestampMixin):
@@ -23,7 +23,9 @@ class ImagePromptMixin(TimestampMixin):
     prompt = models.TextField()
     reply = models.JSONField(null=True, blank=True)
     remote_id = models.CharField(max_length=255, null=True, blank=True)
-    generation_status = models.CharField(max_length=255, choices=ImageGenerationStatus.choices, default=ImageGenerationStatus.WAITING)
+    generation_status = models.CharField(
+        max_length=255, choices=ImageGenerationStatus.choices, default=ImageGenerationStatus.WAITING
+    )
     status_response = models.JSONField(null=True, blank=True)
     waiting_since = models.DateTimeField(null=True, blank=True)
     waiting_until = models.DateTimeField(null=True, blank=True)
@@ -46,8 +48,7 @@ class ImagePromptMixin(TimestampMixin):
     @classmethod
     def install_run_waiting(cls):
         return Schedule.objects.create(
-            name="run_waiting", func=f"{IMPORT_NAME}.ImagePrompt.run_waiting", schedule_type="I",
-            minutes=1
+            name="run_waiting", func=f"{IMPORT_NAME}.ImagePrompt.run_waiting", schedule_type="I", minutes=1
         )
 
     @classmethod
@@ -86,7 +87,9 @@ class ImagePromptMixin(TimestampMixin):
 
     @classmethod
     def get_requested(cls):
-        return cls.objects.filter(status__in=[ImageGenerationStatus.PENDING, ImageGenerationStatus.IN_PROGRESS]).order_by("requested_at")
+        return cls.objects.filter(
+            status__in=[ImageGenerationStatus.PENDING, ImageGenerationStatus.IN_PROGRESS]
+        ).order_by("requested_at")
 
     def request_images(self, watch=False):
         import http.client
