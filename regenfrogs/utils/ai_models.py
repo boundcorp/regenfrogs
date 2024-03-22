@@ -7,22 +7,31 @@ from django_q.tasks import async_task
 
 from regenfrogs.utils.models import TimestampMixin
 
-IMPORT_NAME = "regenfrogs.utils.ai_models"
-
 
 class ImageGenerationStatus(models.TextChoices):
     WAITING = "waiting"
     PENDING = "pending"
     IN_PROGRESS = "in-progress"
-    READY = "ready"
+    FAILED = "failed"
+    COMPLETED = "completed"
+
+
+def to_reference_url(url_or_image_prompt):
+    if isinstance(url_or_image_prompt, str):
+        return url_or_image_prompt
+    if getattr(url_or_image_prompt, "image_chosen", None):
+        return getattr(url_or_image_prompt, "image_chosen").url
 
 
 class ImagePromptMixin(TimestampMixin):
     MAX_CONCURRENCY = 4
+    IPFS_PREFIX = "images"
+    IMPORT_NAME = "regenfrogs.utils.ai_models.ImagePromptMixin"  # Must set this to install schedule
 
     prompt = models.TextField()
     reply = models.JSONField(null=True, blank=True)
     remote_id = models.CharField(max_length=255, null=True, blank=True)
+    ipfs_hash = models.CharField(max_length=255, null=True, blank=True)
     generation_status = models.CharField(
         max_length=255, choices=ImageGenerationStatus.choices, default=ImageGenerationStatus.WAITING
     )
@@ -32,6 +41,7 @@ class ImagePromptMixin(TimestampMixin):
     requested_at = models.DateTimeField(null=True, blank=True)
     completed_at = models.DateTimeField(null=True, blank=True)
     image_chosen = models.PositiveIntegerField(null=True, blank=True)
+    references = models.JSONField(null=True, blank=True)
     image_1 = models.ImageField(upload_to="images/", null=True, blank=True)
     image_2 = models.ImageField(upload_to="images/", null=True, blank=True)
     image_3 = models.ImageField(upload_to="images/", null=True, blank=True)
@@ -39,6 +49,60 @@ class ImagePromptMixin(TimestampMixin):
 
     class Meta:
         abstract = True
+
+    @classmethod
+    def imagine(cls, prompt, references=None, begin_waiting=True):
+        if references and isinstance(references, list):
+            references = list(set(map(to_reference_url, references)))
+        obj = cls.objects.create(prompt=prompt, references=references)
+        if begin_waiting:
+            obj.begin_waiting()
+        return obj
+
+    @property
+    def ipfs_filename(self):
+        return f"{self.id}-{self.image_chosen}.jpg"
+
+    @property
+    def ipfs_path(self):
+        return os.path.join(self.ipfs_hash, self.ipfs_filename)
+
+    @property
+    def ipfs_proxy_url(self):
+        return f"https://ipfs.io/ipfs/{self.ipfs_path}"
+
+    @property
+    def ipfs_url(self):
+        return f"ipfs://{self.ipfs_path}"
+
+    def pin_chosen_to_pinata(self):
+        if self.ipfs_hash:
+            return self
+
+        import json
+
+        import requests
+
+        name = f"{self.IPFS_PREFIX}/"
+        files = {
+            "file": (name, self.chosen_image),
+        }
+
+        pinata_jwt = os.environ.get("PINATA_KEY")
+        pinata_url = "https://api.pinata.cloud/pinning/pinFileToIPFS"
+        headers = {
+            "Authorization": f"Bearer {pinata_jwt}",
+        }
+        data = {
+            "pinataMetadata": json.dumps({"name": name}),
+            "pinataOptions": json.dumps({"cidVersion": 0}),
+        }
+
+        response = requests.post(pinata_url, headers=headers, data=data, files=files)
+        print(response.json())
+        self.ipfs_hash = response.json()["IpfsHash"]
+        self.save()
+        return self
 
     @property
     def chosen_image(self):
@@ -48,7 +112,7 @@ class ImagePromptMixin(TimestampMixin):
     @classmethod
     def install_run_waiting(cls):
         return Schedule.objects.create(
-            name="run_waiting", func=f"{IMPORT_NAME}.ImagePrompt.run_waiting", schedule_type="I", minutes=1
+            name="run_waiting", func=f"{cls.IMPORT_NAME}.run_waiting", schedule_type="I", minutes=1
         )
 
     @classmethod
@@ -64,31 +128,35 @@ class ImagePromptMixin(TimestampMixin):
                 print("  Failed to update image status", image.id)
 
         for image in waiting[: cls.MAX_CONCURRENCY]:
-            if image.get_requested().count() <= cls.MAX_CONCURRENCY:
+            if cls.queue_has_capacity():
                 print("  Starting image...", image.id)
                 image.request_images()
 
-    def begin_waiting(self):
-        self.status = "waiting"
-        self.waiting_since = timezone.now()
-        self.save()
+    @classmethod
+    def queue_has_capacity(cls):
+        return cls.get_requested().count() <= cls.MAX_CONCURRENCY
 
-    def enqueue_image_request(self):
-        self.begin_waiting()
-        async_task("regenfrogs.utils.ai_models.ImagePrompt.wait_turn_for_image_request", self.pk)
+    def begin_waiting(self):
+        self.generation_status = ImageGenerationStatus.WAITING
+        if not self.waiting_since:
+            self.waiting_since = timezone.now()
+        self.save()
+        if self.queue_has_capacity():
+            async_task(f"{self.IMPORT_NAME}.run_waiting")
+        return self
 
     @classmethod
     def get_waiting(cls):
-        return cls.objects.filter(status=ImageGenerationStatus.WAITING).order_by("waiting_since")
+        return cls.objects.filter(generation_status=ImageGenerationStatus.WAITING).order_by("waiting_since")
 
     @classmethod
     def get_pending(cls):
-        return cls.objects.filter(status=ImageGenerationStatus.PENDING).order_by("requested_at")
+        return cls.objects.filter(generation_status=ImageGenerationStatus.PENDING).order_by("requested_at")
 
     @classmethod
     def get_requested(cls):
         return cls.objects.filter(
-            status__in=[ImageGenerationStatus.PENDING, ImageGenerationStatus.IN_PROGRESS]
+            generation_status__in=[ImageGenerationStatus.PENDING, ImageGenerationStatus.IN_PROGRESS]
         ).order_by("requested_at")
 
     def request_images(self, watch=False):
@@ -96,10 +164,10 @@ class ImagePromptMixin(TimestampMixin):
         import json
 
         self.requested_at = timezone.now()
-        self.status = "pending"
+        self.generation_status = ImageGenerationStatus.PENDING
         self.save()
 
-        data = {"prompt": self.prompt}
+        data = {"prompt": self.get_full_prompt()}
 
         headers = {"Authorization": f"Bearer {os.environ.get('IMAGINE_TOKEN')}", "Content-Type": "application/json"}
 
@@ -115,13 +183,15 @@ class ImagePromptMixin(TimestampMixin):
             conn.close()
             self.save()
 
+    def get_full_prompt(self):
+        prompt = self.prompt
+        if self.references and isinstance(self.references, list):
+            prompt = " ".join(self.references) + "\n" + prompt
+        return prompt
+
     def on_complete(self):
         self.completed_at = timezone.now()
         self.save()
-        character = self.avatar_for.first()
-        if character:
-            character.generating = False
-            character.save()
 
     def update_generation_status(self):
         import http.client
@@ -135,14 +205,15 @@ class ImagePromptMixin(TimestampMixin):
         response = conn.getresponse()
         self.status_response = json.loads(response.read().decode("utf-8"))
         try:
-            self.status = self.status_response["data"]["status"]
-            if self.status == "failed":
+            self.generation_status = self.status_response["data"]["status"]
+            if self.generation_status == ImageGenerationStatus.FAILED:
                 print("Image generation failed", self.remote_id, self.status_response["data"])
-            if self.status == "completed":
+            if self.generation_status == ImageGenerationStatus.COMPLETED:
                 self.image_1 = download_image_for_field(self.status_response["data"]["upscaled_urls"][0])
                 self.image_2 = download_image_for_field(self.status_response["data"]["upscaled_urls"][1])
                 self.image_3 = download_image_for_field(self.status_response["data"]["upscaled_urls"][2])
                 self.image_4 = download_image_for_field(self.status_response["data"]["upscaled_urls"][3])
+                self.on_complete()
         except:
             print("Error loading image", self.status_response)
         finally:

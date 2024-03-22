@@ -7,19 +7,30 @@
     "deploy": "vercel",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "gen": "graphql-codegen"
   },
   "dependencies": {
     "@emotion/react": "^11.11.4",
     "@emotion/styled": "^11.11.0",
     "@mui/material": "^5.15.14",
+    "@apollo/client": "^3.9.8",
     "frog": "latest",
+    "graphql": "^15.7.2",
     "hono": "^4",
     "next": "14.1.0",
     "react": "^18",
     "react-dom": "^18"
   },
   "devDependencies": {
+    "@graphql-codegen/cli": "2.16.4",
+    "@graphql-codegen/client-preset": "1.2.6",
+    "@graphql-codegen/import-types-preset": "^1.18.0",
+    "@graphql-codegen/typescript": "1.17.11",
+    "@graphql-codegen/typescript-operations": "1.17.8",
+    "@graphql-codegen/typescript-react-apollo": "2.0.7",
+    "react-dom": "^18",
+    "ts-node": "^10.9.2",
     "@types/node": "^20",
     "@types/react": "^18",
     "@types/react-dom": "^18",
