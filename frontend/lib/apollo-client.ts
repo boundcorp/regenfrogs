@@ -6,7 +6,7 @@ import {getAuthToken} from "./auth";
 
 let apolloClient: ApolloClient<NormalizedCacheObject>;
 
-export const APOLLO_URI = process.env.NEXT_PUBLIC_APOLLO_URI || "/api/graphql/";
+export const APOLLO_URI = process.env.NEXT_PUBLIC_APOLLO_URI || "/frames/graphql/";
 export const APOLLO_BACKEND_URI = process.env.APOLLO_BACKEND_URI || APOLLO_URI
 
 export const createApolloClient = (
