@@ -82,6 +82,7 @@ class ImagePromptMixin(TimestampMixin):
         import json
 
         import requests
+
         name = f"{self.IPFS_PREFIX}/{self.ipfs_filename}"
 
         files = {
