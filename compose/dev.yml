@@ -117,9 +117,7 @@ services:
     command: "yarn dev"
     entrypoint: []
     working_dir: /app/frontend
-    # Uncomment Ports and comment out expose to connect from a local desktop browser
-    #ports: ["${DEVELOP_FRONTEND_PORT}:3000"]
-    expose: ["3000"]
+    expose: ["1122"]
     links:
       - psql
       - minio

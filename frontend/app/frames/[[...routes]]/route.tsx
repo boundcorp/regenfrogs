@@ -1,10 +1,13 @@
 /** @jsxImportSource frog/jsx */
 import {Button, Frog, TextInput} from 'frog'
 import {handle} from 'frog/next'
+import { serveStatic } from 'frog/serve-static'
+import {devtools} from "frog/dev";
 
 const app = new Frog({
-  basePath: '/frames',
+  origin: 'http://localhost:1122/',
   browserLocation: '/:path',
+  basePath: '/frames',
 })
 
 // Uncomment to use Edge Runtime
@@ -29,6 +32,8 @@ app.frame('/', (c) => {
     ]
   })
 })
+
+devtools(app, { serveStatic })
 
 export const GET = handle(app)
 export const POST = handle(app) 
