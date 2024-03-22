@@ -23,6 +23,10 @@ class FrogImage(ImagePromptMixin, MediumIDMixin):
     hands = models.TextField(null=True, blank=True)
     clothes = models.TextField(null=True, blank=True)
 
+    def choose_number(self, number):
+        super().choose_number(number)
+        self.pin_chosen_to_pinata()
+
     @classmethod
     def random(cls, style, references=None):
         species = random.choice(profiles.SPECIES)

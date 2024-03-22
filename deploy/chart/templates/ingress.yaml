@@ -30,6 +30,13 @@ spec:
                 name: {{ include "common.names.fullname" $ }}-backend
                 port:
                   name: http
+          - path: /assets
+            pathType: "Prefix"
+            backend:
+              service:
+                name: {{ include "common.names.fullname" $ }}-minio
+                port:
+                  name: http
           - path: /
             pathType: "Prefix"
             backend:

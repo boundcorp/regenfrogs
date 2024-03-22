@@ -83,7 +83,8 @@ class ImagePromptMixin(TimestampMixin):
 
         import requests
 
-        name = f"{self.IPFS_PREFIX}/"
+        name = f"{self.IPFS_PREFIX}/{self.ipfs_filename}"
+
         files = {
             "file": (name, self.chosen_image),
         }
@@ -159,6 +160,11 @@ class ImagePromptMixin(TimestampMixin):
         return cls.objects.filter(
             generation_status__in=[ImageGenerationStatus.PENDING, ImageGenerationStatus.IN_PROGRESS]
         ).order_by("requested_at")
+
+    def choose_number(self, number):
+        self.image_chosen = number
+        self.save()
+        return self
 
     def request_images(self, watch=False):
         import http.client
