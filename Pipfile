@@ -50,6 +50,11 @@ django-webpack-loader = "*"
 types-python-dateutil = "*"
 django-minio-storage = "*"
 django-storages = {extras = ["google"], version = "*"}
+django-anymail = {extras = ["sendgrid"], version = "*"}
+openai = "*"
+pillow = "*"
+web3 = "*"
+python-dotenv = "*"
 
 [requires]
 python_version = "3.10"

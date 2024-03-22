@@ -23,6 +23,7 @@
     "@types/react-dom": "18.0.10",
     "eslint": "^8.31.0",
     "eslint-config-next": "13.1.1",
+    "frog": "^0.7.4",
     "lodash": "^4.17.21",
     "next": "13.1.1",
     "notistack": "^2.0.8",

@@ -24,7 +24,7 @@ spec:
       http:
         paths:
           - path: /(mgmt|api|dj-static|healthz)(.*)
-            pathType: "Prefix"
+            pathType: "ImplementationSpecific"
             backend:
               service:
                 name: {{ include "common.names.fullname" $ }}-backend

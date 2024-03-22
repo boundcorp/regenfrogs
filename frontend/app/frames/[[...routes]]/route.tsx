@@ -3,14 +3,14 @@ import {Button, Frog, TextInput} from 'frog'
 import {handle} from 'frog/next'
 
 const app = new Frog({
-  basePath: '/api',
+  basePath: '/frames',
   browserLocation: '/:path',
 })
 
 // Uncomment to use Edge Runtime
 // export const runtime = 'edge'
 
-app.frame('/foo', (c) => {
+app.frame('/', (c) => {
   const {buttonValue, status} = c
   return c.res({
     image: (
