@@ -1,0 +1,6 @@
+---
+creation_rules:
+  - path_regex: (.*)\.secrets\.(.*)
+    key_groups:
+      - age:
+          - "age1t52j4y9qq32qnemahzvthge23mayrcfy3cjw9a8mrcw940vt6das0alrkz" # Leeward

@@ -1,0 +1,15 @@
+overwrite: true
+schema: "../schema.graphql"
+documents: "../regenfrogs/**/*.graphql"
+generates:
+  generated/graphql.tsx:
+    plugins:
+      - typescript
+      - typescript-operations
+      - typescript-react-apollo
+    config:
+      reactApolloVersion: 3
+      withHooks: true
+      exportFragmentSpreadSubTypes: true
+      documentMode: graphQLTag
+      preResolveTypes: true

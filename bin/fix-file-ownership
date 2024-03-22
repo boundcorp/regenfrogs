@@ -1,0 +1,14 @@
+#!/usr/bin/env bash
+cd $(dirname $0)/..
+
+FILES=$(find . -uid 0)
+FOUND=$(echo "$FILES" | egrep -i "[a-z]" | wc -l)
+
+if [[ "$FOUND" == "0" ]] ; then
+    echo "No files owned by root in this directory!"
+else
+   echo "$FILES"
+	 echo "Found $FOUND files owned by root user - this happens when files are created by the docker containers"
+	 echo "We will change their ownership, but you'll need to authorize sudo:"
+	 sudo chown -R ${USER}:${USER} .
+ fi

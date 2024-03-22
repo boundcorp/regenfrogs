@@ -1,0 +1,18 @@
+#!/bin/bash
+scriptDir="$(cd "$(dirname "${BASH_SOURCE[0]}")" >/dev/null 2>&1 && pwd)"
+cd "${scriptDir}/../.." || exit 1
+set -e
+
+if [[ "$1" != ".sops.yaml" ]]; then
+  if grep -q encrypted_regex "$1" || grep -q '^sops:' "$1" || grep -qe '\"sops\"' "$1" || grep -qe "^sops_" ; then
+    echo "ALREADY ENCRYPTED: $1" 1>&2
+    cat $1
+  else
+    if [[ -z "$(cat $1)" ]]; then
+      echo "NO DATA TO ENCRYPT: $1" 1>&2
+    else
+      echo "ENCRYPT: $1 ($(cat $1 | wc -l) bytes)" 1>&2
+      sops --encrypt "$1"
+    fi
+  fi
+fi

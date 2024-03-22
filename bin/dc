@@ -1,0 +1,4 @@
+#!/bin/bash
+ROLE=$(test -z "$ROLE" && echo "dev" || echo "$ROLE")
+PROJECT=$(test -z "$CI_PROJECT_NAME" && echo "$(basename $PWD)" || echo "$CI_PROJECT_NAME")
+UID_GID="$(id -u):$(id -g)" docker compose -p $PROJECT -f compose/$ROLE.yml $*

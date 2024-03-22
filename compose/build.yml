@@ -1,0 +1,22 @@
+version: "2.3"
+services:
+  minio-with-buckets:
+    build:
+      context: ./minio
+    image: minio-with-buckets
+  regenfrogs-django-dev:
+    build:
+      context: ../
+      dockerfile: Dockerfile
+      target: dev
+      args:
+        PYTHON_VERSION: ${PYTHON_VERSION}
+    image: ${CI_PROJECT_NAME}/django-dev:${CI_PROJECT_NAME}
+  regenfrogs-django:
+    build:
+      context: ../
+      dockerfile: Dockerfile
+      target: release-backend
+      args:
+        PYTHON_VERSION: ${PYTHON_VERSION}
+    image: ${CI_REGISTRY_IMAGE}/release-backend:latest

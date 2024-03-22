@@ -1,0 +1,10 @@
+#!/usr/bin/env bash
+set -e
+
+cd $(dirname $0)/..
+
+if [[ $(git diff --stat) != '' ]]; then
+    echo "$(git rev-parse --short HEAD).$(date | md5sum | awk '{print $1}')"
+else
+    echo $(git rev-parse HEAD)
+fi

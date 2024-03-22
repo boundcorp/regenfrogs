@@ -1,0 +1,11 @@
+#!/usr/bin/env bash
+cd $(dirname $0)/../..
+
+# Auto-unlocking is suffering some difficulties when switching between branches
+# Disabled for now - you can still use the "clean" filter to auto-lock any unlocked files
+# and unlock them by hand with `scripts/sops/sops-unlock -i <file>`
+# Note: use `cat` to define a smudge filter that does nothing, or else it will fail on branch change
+git config --local filter.sops.smudge cat #"$(pwd)/scripts/sops/sops-unlock %f"
+
+git config --local filter.sops.clean "$(pwd)/bin/sops/lock-file %f"
+git config --local filter.sops.required true

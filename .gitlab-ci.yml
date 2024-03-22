@@ -1,0 +1,89 @@
+stages:
+  - build
+  - test
+  - deploy_staging
+  - deploy_production
+
+
+variables:
+  # for git crypt
+  GIT_STRATEGY: clone
+  GIT_DEPTH: 1
+  POSTGRES_DB: postgres
+  POSTGRES_USER: postgres
+  POSTGRES_PASSWORD: postgres
+  PGUSER: postgres
+  PGPASSWORD: postgres
+
+build_docker_image:
+  stage: build
+  interruptible: true
+  script:
+    - docker login -u $CI_REGISTRY_USER -p $CI_JOB_TOKEN $CI_REGISTRY
+    #
+    - echo "Building dev docker container image for later CI pipeline steps..."
+    - bin/push "${CI_COMMIT_SHA}" dev
+    #
+    - echo "Building release-backend docker container image..."
+    - bin/push "${CI_COMMIT_SHA}" release-backend
+    #
+    - echo "Building release-frontend docker container image..."
+    - bin/push "${CI_COMMIT_SHA}" release-frontend
+    #
+    - echo "Building deployment helper container image..."
+    - bin/push latest deploy
+
+test_backend:
+  stage: test
+  image: "${CI_REGISTRY_IMAGE}/dev:${CI_COMMIT_SHA}"
+  needs:
+    - build_docker_image
+  services:
+    - name: postgres:13.3-alpine
+      alias: postgres
+  script:
+    - export DATABASE_URL=postgres://postgres:postgres@postgres:5432/postgres
+    - make test_backend_coverage
+
+.deploy:
+  image: "${CI_REGISTRY_IMAGE}/deploy:latest"
+  cache:
+    policy: pull
+  before_script:
+    # Uncomment these lines to authenticate with the GKE cluster
+    #- gcloud auth activate-service-account --key-file $GCP_SERVICE_KEY
+    #- gcloud container clusters get-credentials regenfrogs --zone=us-west2-a --project=$GCP_PROJECT_ID
+
+    # Or use these lines with the deploy/cluster/install_ci_serviceaccount.sh script
+    # to create a service account and store the connection file in the repo with git-crypt
+    - export SA=$PWD/kubeconfig-sa.${ENV}.secrets.yaml
+    - bin/sops/unlock-file $SA > $SA.decrypted
+    - export KUBECONFIG=$SA.decrypted
+    - chmod 0600 $KUBECONFIG
+
+    - export SECRETS=$PWD/helm-values.${ENV}.secrets.yaml
+    - bin/sops/unlock-file $SECRETS > $SECRETS.decrypted
+    - docker login -u $CI_REGISTRY_USER -p $CI_JOB_TOKEN $CI_REGISTRY
+    - helm dependency update ./deploy/chart/
+  script:
+    - bin/helm-deploy "${CI_COMMIT_SHA}" "${ENV}" "$SECRETS.decrypted"
+
+
+deploy_staging:
+  extends: .deploy
+  stage: deploy_staging
+  variables:
+    ENV: staging
+  rules:
+    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
+
+deploy_production:
+  stage: deploy_production
+  extends: .deploy
+  variables:
+    ENV: production
+  environment:
+    name: production
+    url: https://regenfrogs.boundcorp.net
+  rules:
+    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH

@@ -1,0 +1,4 @@
+#!/usr/bin/env bash
+git config --local filter.sops.smudge $(pwd)/bin/sops-unlock
+git config --local filter.sops.clean $(pwd)/bin/sops-lock
+git config --local filter.sops.required true

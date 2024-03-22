@@ -1,0 +1,39 @@
+#!/usr/bin/env bash
+set -e
+
+cd $(dirname $0)/..
+
+[[ "$CI" == "true" ]] || [[ $(kubectx -c) == $KUBE_CLUSTER ]] || (echo "Must be attached to the $KUBE_CLUSTER cluster" && exit 1)
+
+VERSION=$(test -z "$1" && echo "latest" || echo "$1")
+CHANNEL=$(test -z "$2" && echo "staging" || echo "$2")
+VALUES=$(test -z "$3" && echo "helm-values.$CHANNEL.secrets.yaml" || echo "$3")
+
+for TAG_IMAGE in "release-backend" "release-frontend"; do
+  export SUFFIX="$CHANNEL/$TAG_IMAGE"
+  export SOURCE_IMAGE="$CI_REGISTRY_IMAGE/$TAG_IMAGE:$VERSION"
+  export TAG="$CI_REGISTRY_IMAGE/$CHANNEL/$TAG_IMAGE:$VERSION"
+
+  echo
+  echo "********************************"
+  echo "Tagging $SOURCE_IMAGE as '$TAG'"
+  echo "********************************"
+  echo
+
+  [[ "$BUILD_AND_PUSH" == "true" ]] && bin/push "$VERSION" "$TAG_IMAGE" || docker pull $SOURCE_IMAGE
+  docker tag "$SOURCE_IMAGE" "$TAG"
+  docker push "$TAG"
+
+done
+NAMESPACE="${CI_PROJECT_NAME}-${CHANNEL}"
+RELEASE_NAME="${CI_PROJECT_NAME}"
+echo "Deploying helm release into $NAMESPACE..."
+
+
+kubectl get pods -n $NAMESPACE
+
+helm upgrade --install $RELEASE_NAME deploy/chart/ \
+    --values="$VALUES" \
+    -n $NAMESPACE \
+    --set image.repository=$CI_REGISTRY_IMAGE/$CHANNEL \
+    --set image.tag=$VERSION

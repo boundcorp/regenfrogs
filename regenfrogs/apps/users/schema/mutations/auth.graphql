@@ -1,0 +1,69 @@
+mutation tokenAuth($username_Iexact: String!, $password: String!) {
+    tokenAuth(username_Iexact: $username_Iexact, password: $password) {
+        __typename
+        ... on TokenAuthSuccess {
+            token
+            refreshToken
+        }
+        ... on Error {
+            message
+        }
+    }
+}
+mutation sendPasswordResetEmail($email: String!) {
+    sendPasswordResetEmail(email: $email) {
+        __typename
+        ... on SendPasswordResetEmailSuccess {
+            success
+        }
+        ... on Error {
+            message
+        }
+    }
+}
+
+mutation passwordReset(
+    $token: String!
+    $newPassword1: String!
+    $newPassword2: String!
+) {
+    passwordReset(
+        token: $token
+        newPassword1: $newPassword1
+        newPassword2: $newPassword2
+    ) {
+        __typename
+        ... on PasswordResetSuccess {
+            success
+        }
+        ... on Error {
+            message
+        }
+    }
+}
+mutation logout {
+    logout {
+        __typename
+        ... on LogoutSuccess {
+            success
+        }
+        ... on Error {
+            message
+        }
+    }
+}
+
+
+mutation updateUserProfile($input: UpdateUserProfileInput) {
+    updateUserProfile(input: $input) {
+        __typename
+        ... on UpdateUserProfileSuccess {
+            user {
+                ...UserProfile
+            }
+        }
+        ... on Error {
+            message
+        }
+    }
+}

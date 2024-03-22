@@ -1,0 +1,130 @@
+# -- Server replicas
+replicas:
+  backend: 2
+  frontend: 1
+  qcluster: 1
+# -- Custom priority class for different treatment by the scheduler
+priorityClassName:
+
+image:
+  repository: registry.gitlab.com/boundcorp/regenfrogs/regenfrogs
+  tag: latest
+  pullPolicy: IfNotPresent
+  pullSecrets:
+    - name: "gitlab-pull-secret"
+
+worker:
+  # -- worker replicas
+  replicas: 1
+  # -- Custom priority class for different treatment by the scheduler
+  priorityClassName:
+
+ingress:
+  enabled: false
+  ingressClassName: ""
+  annotations: {}
+  labels: {}
+  hostname: regenfrogs.boundcorp.net
+  tls:
+    - hosts: ["regenfrogs.boundcorp.net"]
+      secretName: "regenfrogs-tls"
+
+env:
+  APP_HOSTNAME: regenfrogs.boundcorp.net
+  DATABASE_URL: postgresql://regenfrogs:regenfrogs@regenfrogs-postgresql:5432/regenfrogs
+  # -- Secret key used for cookie singing and unique user IDs,
+  # don't change this after the first install
+  SECRET_KEY: ""
+  MINIO_STORAGE_ENDPOINT: regenfrogs-minio:9000
+  MINIO_STORAGE_ACCESS_KEY: regenfrogs
+  MINIO_STORAGE_SECRET_KEY: regenfrogs-secret
+  MINIO_STORAGE_MEDIA_BUCKET_NAME: assets
+  MINIO_STORAGE_USE_HTTPS: false
+  MINIO_STORAGE_AUTO_CREATE_MEDIA_BUCKET: true
+  MINIO_STORAGE_MEDIA_URL: "https://regenfrogs.boundcorp.net/assets"
+  MINIO_STORAGE_MEDIA_USE_PRESIGNED: true
+
+
+envFrom: []
+#  - configMapRef:
+#      name: special-config
+
+envValueFrom: {}
+
+service:
+  backend:
+    enabled: true
+    type: ClusterIP
+    port: 8000
+    name: http
+    protocol: TCP
+    labels: {}
+    annotations: {}
+  frontend:
+    enabled: true
+    type: ClusterIP
+    port: 3000
+    name: http
+    protocol: TCP
+    labels: {}
+    annotations: {}
+
+volumes: []
+
+volumeMounts: []
+
+# -- affinity applied to the deployments
+affinity: {}
+
+# -- nodeSelector applied to the deployments
+nodeSelector: {}
+
+resources:
+  server: {}
+  worker: {}
+
+livenessProbe:
+  # -- enables or disables the livenessProbe
+  enabled: true
+  httpGet:
+    path: /healthz/
+    port: http
+  initialDelaySeconds: 20
+  periodSeconds: 10
+
+readinessProbe:
+  enabled: true
+  httpGet:
+    path: /healthz/
+    port: http
+  initialDelaySeconds: 10
+  periodSeconds: 5
+
+prometheus:
+  serviceMonitor:
+    create: false
+    interval: 30s
+    scrapeTimeout: 3s
+  rules:
+    create: false
+
+postgresql:
+  # -- enable the bundled bitnami postgresql chart
+  enabled: true
+  global:
+    postgresql:
+      auth:
+        postgresPassword: "regenfrogs"
+        username: "regenfrogs"
+        password: "regenfrogs"
+        database: "regenfrogs"
+
+minio:
+  # -- enable the bundled bitnami minio chart
+  enabled: true
+  rootUser: "regenfrogs"
+  rootPassword: "regenfrogs-secret"
+  mode: standalone
+  replicas: 1
+  buckets:
+    - name: assets

@@ -1,0 +1,24 @@
+*.pyc
+.pytest_cache
+.sqlite-test-db
+*/conf/local.py
+.local_env
+.vscode
+# IMPORTANT: only ignore /static (root folder)
+# do not ignore sub-static folders (like regenfrogs/apps/samples/static/)
+/static
+env
+compose/django/pip.cache
+.pythonhist
+.pythonrc
+
+htmlcov
+.coverage
+.coverage.*
+coverage.xml
+*.cover
+
+.idea
+
+.settings
+.venv

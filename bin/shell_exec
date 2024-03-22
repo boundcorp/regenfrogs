@@ -1,0 +1,10 @@
+#!/usr/bin/env bash
+USAGE="shell_exec 'print(User.objects.all())'"
+
+test -z "$*" && (echo $USAGE && exit 1)
+
+cd $(dirname $0)/..
+FN=$(mktemp "${TMPDIR:-/tmp/}$(basename $0).XXXXXXXXXXXX")
+
+echo "$*" > $FN
+python manage.py shell_plus -- -c "$*"

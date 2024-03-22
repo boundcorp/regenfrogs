@@ -1,0 +1,60 @@
+[[source]]
+name = "pypi"
+url = "https://pypi.org/simple"
+verify_ssl = true
+
+[dev-packages]
+pre-commit = "*"
+faker = "*"
+black = "*"
+isort = "*"
+mypy = "*"
+flake8 = "*"
+types-requests = "*"
+pytest = "*"
+pytest-django = "*"
+pytest-xdist = "*"
+pytest-cov = "*"
+
+[packages]
+django = "~=4.2"
+django-environ = "*"
+django-cors-headers = "*"
+django-memoize = "*"
+django-debug-toolbar = "*"
+requests = "*"
+python-stdnum = "*"
+uritemplate = "*"
+django-rest-framework = "*"
+django-extensions = "*"
+django-filter = "*"
+psycopg2-binary = "*"
+uwsgi = "*"
+whitenoise = "*"
+six = "*"
+django-anymail = {extras = ["sendgrid"], version = "*"}
+premailer = "*"
+retrying = "*"
+ipython = "*"
+phonenumbers = "*"
+awesome-slugify = "*"
+autoflake = "*"
+pycurl = "*"
+graphene-django = "*"
+graphene-validator = "*"
+factory-boy = "*"
+django-stubs = "*"
+django-fsm = "*"
+django-graphql-jwt = "*"
+django-q = "*"
+django-webpack-loader = "*"
+sentry-sdk = "*"
+types-python-dateutil = "*"
+django-minio-storage = "*"
+django-storages = {extras = ["google"], version = "*"}
+
+[requires]
+python_version = "3.10"
+
+[pipenv]
+allow_prereleases = true

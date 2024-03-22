@@ -1,0 +1,14 @@
+#!/usr/bin/env sh
+set -e
+
+cd $(dirname $0)/..
+
+VERSION=$(test -z "$1" && echo "latest" || echo "$1")
+TARGET=$(test -z "$2" && echo "" || echo "$2")
+TARGET_ARGS=$(test -z "$TARGET" && echo "" || echo "--target=$TARGET")
+TARGET_SUFFIX=$(test -z "$TARGET" && echo "" || echo "/$TARGET")
+IMAGE="${CI_REGISTRY_IMAGE}${TARGET_SUFFIX}:$VERSION"
+
+echo "Building image: $IMAGE"
+
+docker build $TARGET_ARGS . -t $IMAGE

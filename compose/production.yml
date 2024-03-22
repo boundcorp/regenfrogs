@@ -1,0 +1,28 @@
+version: '2.1'
+services:
+  psql:
+    image: sameersbn/postgresql:14
+#    expose:
+#      - '5432'
+    ports:
+    - "5432:5432"
+    environment:
+      DB_NAME: ${CI_PROJECT_NAME}
+      DB_PASS: ${CI_PROJECT_NAME}
+      DB_USER: ${CI_PROJECT_NAME}
+    volumes:
+      - /data/${CI_PROJECT_NAME}/production/postgresql:/var/lib/postgresql
+
+  backend:
+    extends:
+      service: ${CI_PROJECT_NAME}-backend-django
+      file: build.yml
+    command: ["/wsgi.sh"]
+    ports:
+      - "${DEVELOP_BACKEND_PORT}:8000"
+    links:
+      - psql
+    environment:
+      - ENV
+      - SECRET_KEY
+      - SERVICE=runserver

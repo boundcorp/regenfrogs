@@ -1,0 +1,92 @@
+{{- range list "backend" }}
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ printf "%s-%s" (include "common.names.fullname" $) . }}
+  labels:
+    app.kubernetes.io/component: "{{ . }}"
+spec:
+  replicas: {{ $.Values.replicas.backend }}
+  selector:
+    matchLabels:
+      app.kubernetes.io/component: "{{ . }}"
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/component: "{{ . }}"
+        app.kubernetes.io/version: "{{ $.Values.image.tag }}"
+    spec:
+      {{- if $.Values.image.pullSecrets }}
+      imagePullSecrets:
+        {{- toYaml $.Values.image.pullSecrets | nindent 8 }}
+      {{- end }}
+      {{- with $.Values.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with $.Values.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      enableServiceLinks: true
+      priorityClassName: {{ $.Values.priorityClassName }}
+      containers:
+        - name: {{ $.Chart.Name }}
+          image: "{{ $.Values.image.repository }}/release-backend:{{ $.Values.image.tag }}"
+          imagePullPolicy: "{{ $.Values.image.pullPolicy }}"
+          {{ if eq . "backend" -}}
+          args: ["/entrypoint.sh", "/uwsgi.sh"]
+          {{ else if eq . "qcluster" -}}
+          args: ["/entrypoint.sh", "python3", "manage.py", "qcluster"]
+          {{- end }}
+          env:
+            - name: "SENTRY_RELEASE"
+              value: {{ $.Values.image.tag }}
+            - name: "SERVICE"
+              value: {{quote .}}
+            {{- range $k, $v := $.Values.env }}
+            - name: {{ quote $k }}
+              value: {{ quote $v }}
+            {{- end }}
+            {{- range $name, $val := $.Values.envValueFrom }}
+            - name: {{ $name }}
+              valueFrom:
+                {{- toYaml $val | nindent 16 }}
+            {{- end }}
+            {{- with $.Values.envFrom }}
+          envFrom:
+              {{- toYaml . | nindent 12 }}
+            {{- end }}
+          volumeMounts:
+            {{- with $.Values.volumeMounts }}
+            {{- toYaml . | nindent 12 }}
+            {{- end }}
+            {{- if eq . "backend" }}
+          ports:
+            - name: http
+              containerPort: 8000
+              protocol: TCP
+              {{- if eq . "backend" -}}
+              {{- if $.Values.livenessProbe.enabled }}
+                {{- with omit $.Values.livenessProbe "enabled" }}
+          livenessProbe:
+                  {{- toYaml . | nindent 12 }}
+                {{- end }}
+              {{- end }}
+              {{- if $.Values.readinessProbe.enabled  }}
+                {{- with omit $.Values.readinessProbe "enabled" }}
+          readinessProbe:
+                  {{- toYaml . | nindent 12 }}
+                {{- end }}
+              {{- end }}
+            {{- end }}
+            {{- end }}
+            {{- with index $.Values.resources . }}
+          resources:
+              {{- toYaml . | nindent 12 }}
+            {{- end }}
+      {{- with $.Values.volumes }}
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+{{- end }}

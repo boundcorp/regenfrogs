@@ -1,0 +1,6 @@
+#!/usr/bin/env bash
+source $(dirname $0)/../.secrets.env
+
+KUBECONFIG=$PROJECT_KUBECONFIG gcloud container clusters get-credentials $KUBE_CLUSTER --zone=$GCP_REGION --project=$GCP_PROJECT_ID
+kubectx ${KUBE_CLUSTER}=gke_${GCP_PROJECT_ID}_${GCP_REGION}_${KUBE_CLUSTER}
+kubectx ${KUBE_CLUSTER}

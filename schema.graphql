@@ -1,0 +1,82 @@
+schema {
+  query: Query
+  mutation: Mutation
+}
+
+type Error {
+  message: String!
+}
+
+union LogoutResult = LogoutSuccess | Error
+
+type LogoutSuccess {
+  success: Boolean
+}
+
+type Mutation {
+  tokenAuth(password: String!, username_Iexact: String!): TokenAuthResult
+  sendPasswordResetEmail(email: String!): SendPasswordResetEmailResult
+  passwordReset(newPassword1: String!, newPassword2: String!, token: String!): PasswordResetResult
+  logout: LogoutResult
+  updateUserProfile(input: UpdateUserProfileInput): UpdateUserProfileResult
+  registerBusiness(input: RegisterInput): RegisterResult
+}
+
+union PasswordResetResult = PasswordResetSuccess | Error
+
+type PasswordResetSuccess {
+  success: Boolean
+}
+
+type Query {
+  myProfile: UserProfile
+}
+
+input RegisterInput {
+  email: String!
+  password: String!
+  passwordConfirm: String!
+  firstName: String!
+  lastName: String!
+}
+
+union RegisterResult = RegisterSuccess | Error
+
+type RegisterSuccess {
+  user: UserProfile
+}
+
+union SendPasswordResetEmailResult = SendPasswordResetEmailSuccess | Error
+
+type SendPasswordResetEmailSuccess {
+  success: Boolean
+}
+
+union TokenAuthResult = TokenAuthSuccess | Error
+
+type TokenAuthSuccess {
+  token: String
+  refreshToken: String
+  user: UserProfile
+}
+
+input UpdateUserProfileInput {
+  firstName: String
+  lastName: String
+  email: String
+}
+
+union UpdateUserProfileResult = UpdateUserProfileSuccess | Error
+
+type UpdateUserProfileSuccess {
+  user: UserProfile
+}
+
+type UserProfile {
+  username: String!
+  firstName: String!
+  lastName: String!
+  email: String!
+  isStaff: Boolean!
+  id: String!
+}

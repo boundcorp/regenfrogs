@@ -1,0 +1,10 @@
+#!/bin/bash
+
+scriptDir="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
+cd "${scriptDir}/../.." || exit 1
+
+set -eux
+find . -name "*.secrets.*" | \
+ grep -v "/\.sops\.yaml" | \
+ grep "$*" | \
+ xargs -rt -n1 sops --decrypt --in-place

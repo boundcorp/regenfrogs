@@ -1,0 +1,6 @@
+#!/usr/bin/env bash
+
+DEV_HOST="https://localhost:$DEVELOP_INGRESS_PORT"
+
+echo "Launching development host at $DEV_HOST"
+open $DEV_HOST
