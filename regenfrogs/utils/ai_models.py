@@ -212,12 +212,12 @@ class ImagePromptMixin(TimestampMixin):
             and self.requested_at
             and timezone.now() - self.requested_at > timezone.timedelta(minutes=5)
         ):
-            print("Error loading image", self.status_response)
+            print("Error loading image", self.pk, self.status_response)
             self.generation_status = ImageGenerationStatus.FAILED
         try:
             self.generation_status = self.status_response["data"]["status"]
             if self.generation_status == ImageGenerationStatus.FAILED:
-                print("Image generation failed", self.remote_id, self.status_response["data"])
+                print("Image generation failed", self.pk, self.status_response["data"])
             if self.generation_status == ImageGenerationStatus.COMPLETED:
                 self.image_1 = download_image_for_field(self.status_response["data"]["upscaled_urls"][0])
                 self.image_2 = download_image_for_field(self.status_response["data"]["upscaled_urls"][1])
@@ -225,7 +225,7 @@ class ImagePromptMixin(TimestampMixin):
                 self.image_4 = download_image_for_field(self.status_response["data"]["upscaled_urls"][3])
                 self.on_complete()
         except:
-            print("Error loading image", self.status_response)
+            print("Error loading image", self.pk, self.status_response)
         finally:
             conn.close()
             self.save()
