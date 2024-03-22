@@ -56,12 +56,7 @@ class FrogImageAdmin(ModelAdmin):
         if obj.references:
             return mark_safe(
                 '<div style="width: 600px">%s</div>'
-                % "".join(
-                    [
-                        preview_image(img, height=200, width=200)
-                        for img in obj.references
-                    ]
-                )
+                % "".join([preview_image(img, height=200, width=200) for img in obj.references])
             )
 
     @admin.display(description="Generated Images")
