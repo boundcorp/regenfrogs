@@ -17,4 +17,4 @@ class Mutation(
     pass
 
 
-application_schema = graphene.Schema(query=Query, mutation=Mutation)
+application_schema = graphene.Schema(query=Query)

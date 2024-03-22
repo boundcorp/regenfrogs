@@ -7,12 +7,13 @@ from django_q.tasks import async_task
 
 from regenfrogs.utils.models import TimestampMixin
 
+
 class ImageGenerationStatus(models.TextChoices):
-    WAITING = 'waiting'
-    PENDING = 'pending'
-    IN_PROGRESS = 'in-progress'
-    FAILED = 'failed'
-    COMPLETED = 'completed'
+    WAITING = "waiting"
+    PENDING = "pending"
+    IN_PROGRESS = "in-progress"
+    FAILED = "failed"
+    COMPLETED = "completed"
 
 
 def to_reference_url(url_or_image_prompt):
@@ -25,14 +26,15 @@ def to_reference_url(url_or_image_prompt):
 class ImagePromptMixin(TimestampMixin):
     MAX_CONCURRENCY = 4
     IPFS_PREFIX = "images"
-    IMPORT_NAME = "regenfrogs.utils.ai_models.ImagePromptMixin" # Must set this to install schedule
+    IMPORT_NAME = "regenfrogs.utils.ai_models.ImagePromptMixin"  # Must set this to install schedule
 
     prompt = models.TextField()
     reply = models.JSONField(null=True, blank=True)
     remote_id = models.CharField(max_length=255, null=True, blank=True)
     ipfs_hash = models.CharField(max_length=255, null=True, blank=True)
-    generation_status = models.CharField(max_length=255, choices=ImageGenerationStatus.choices,
-                                         default=ImageGenerationStatus.WAITING)
+    generation_status = models.CharField(
+        max_length=255, choices=ImageGenerationStatus.choices, default=ImageGenerationStatus.WAITING
+    )
     status_response = models.JSONField(null=True, blank=True)
     waiting_since = models.DateTimeField(null=True, blank=True)
     waiting_until = models.DateTimeField(null=True, blank=True)
@@ -58,8 +60,10 @@ class ImagePromptMixin(TimestampMixin):
         return obj
 
     def pin_chosen_to_pinata(self):
-        import requests
         import json
+
+        import requests
+
         pinata_metadata = {
             "name": f"{self.IPFS_PREFIX}/{self.id}-{self.image_chosen}.jpg",
         }
@@ -90,8 +94,7 @@ class ImagePromptMixin(TimestampMixin):
     @classmethod
     def install_run_waiting(cls):
         return Schedule.objects.create(
-            name="run_waiting", func=f"{cls.IMPORT_NAME}.run_waiting", schedule_type="I",
-            minutes=1
+            name="run_waiting", func=f"{cls.IMPORT_NAME}.run_waiting", schedule_type="I", minutes=1
         )
 
     @classmethod
@@ -135,7 +138,8 @@ class ImagePromptMixin(TimestampMixin):
     @classmethod
     def get_requested(cls):
         return cls.objects.filter(
-            generation_status__in=[ImageGenerationStatus.PENDING, ImageGenerationStatus.IN_PROGRESS]).order_by("requested_at")
+            generation_status__in=[ImageGenerationStatus.PENDING, ImageGenerationStatus.IN_PROGRESS]
+        ).order_by("requested_at")
 
     def request_images(self, watch=False):
         import http.client

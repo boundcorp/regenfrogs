@@ -1,18 +1,20 @@
 /** @jsxImportSource frog/jsx */
-import {Button, Frog, TextInput} from 'frog'
-import {handle} from 'frog/next'
+
+import { Button, Frog, TextInput } from 'frog'
+import { devtools } from 'frog/dev'
+// import { neynar } from 'frog/hubs'
+import { handle } from 'frog/next'
 import { serveStatic } from 'frog/serve-static'
-import {devtools} from "frog/dev";
 
 const app = new Frog({
-  origin: 'http://localhost:1122/',
-  browserLocation: '/:path',
+  assetsPath: '/',
   basePath: '/frames',
+  // Supply a Hub to enable frame verification.
+  // hub: neynar({ apiKey: 'NEYNAR_FROG_FM' })
 })
 
 // Uncomment to use Edge Runtime
 // export const runtime = 'edge'
-
 
 type FrogProfile = {
   alive: boolean
