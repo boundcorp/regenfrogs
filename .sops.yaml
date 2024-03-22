@@ -4,3 +4,5 @@ creation_rules:
     key_groups:
       - age:
           - "age1t52j4y9qq32qnemahzvthge23mayrcfy3cjw9a8mrcw940vt6das0alrkz" # Leeward
+          - "age1d8d79vsrf9h0avg3dwjl8fxsx3knzhvtg0ykf4k8w539878ql5zs53q6pj" # gitlab ci
+          - "age1a9fr72jum5ysrpfyw7z9fcp9dgfztd5wskmu4erj6e526ul334dq8clzec" # audball

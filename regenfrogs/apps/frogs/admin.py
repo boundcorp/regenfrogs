@@ -5,14 +5,15 @@ from django.utils.safestring import mark_safe
 
 from regenfrogs.utils.admin import register
 
-from . import models
 from ...utils.ai_models import ImageGenerationStatus
+from . import models
 
 
 @register(models.FrogImage)
 class FrogImageAdmin(ModelAdmin):
     list_display = [
         "id",
+        "get_generated",
         "prompt",
         "generation_status",
         "requested_at",
