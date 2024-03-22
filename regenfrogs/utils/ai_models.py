@@ -59,32 +59,50 @@ class ImagePromptMixin(TimestampMixin):
             obj.begin_waiting()
         return obj
 
+    @property
+    def ipfs_filename(self):
+        return f"{self.id}-{self.image_chosen}.jpg"
+
+    @property
+    def ipfs_path(self):
+        return os.path.join(self.ipfs_hash, self.ipfs_filename)
+
+    @property
+    def ipfs_proxy_url(self):
+        return f"https://ipfs.io/ipfs/{self.ipfs_path}"
+
+    @property
+    def ipfs_url(self):
+        return f"ipfs://{self.ipfs_path}"
+
     def pin_chosen_to_pinata(self):
+        if self.ipfs_hash:
+            return self
+
         import json
 
         import requests
-        name = f"{self.IPFS_PREFIX}/{self.id}-{self.image_chosen}.jpg"
 
-        pinata_metadata = {
-            "name": name,
+        name = f"{self.IPFS_PREFIX}/"
+        files = {
+            'file': (name, self.chosen_image),
         }
-        pinata_options = {
-            "cidVersion": 0,
-        }
+
         pinata_jwt = os.environ.get("PINATA_KEY")
         pinata_url = "https://api.pinata.cloud/pinning/pinFileToIPFS"
-        pinata_headers = {
-            "Content-Type": "multipart/form-data",
+        headers = {
             "Authorization": f"Bearer {pinata_jwt}",
         }
-        pinata_data = {
-            "pinataMetadata": json.dumps(pinata_metadata),
-            "pinataOptions": json.dumps(pinata_options),
+        data = {
+            "pinataMetadata": json.dumps({"name": name}),
+            "pinataOptions": json.dumps({"cidVersion": 0}),
         }
-        response = requests.post(pinata_url, files=[(name, self.chosen_image)], data=pinata_data, headers=pinata_headers)
+
+        response = requests.post(pinata_url, headers=headers, data=data, files=files)
         print(response.json())
         self.ipfs_hash = response.json()["IpfsHash"]
         self.save()
+        return self
 
     @property
     def chosen_image(self):
