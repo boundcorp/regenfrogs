@@ -41,10 +41,18 @@ class FrogImageAdmin(ModelAdmin):
         "image_3",
         "image_4",
     ]
+    actions = [
+        "choose_one",
+        "choose_two",
+        "choose_three",
+        "choose_four",
+    ]
 
     @admin.display(description="Generated Images")
     def get_generated(self, obj):
         if obj.generation_status == ImageGenerationStatus.COMPLETED:
+            if obj.image_chosen:
+                return preview_image(getattr(obj, f"image_{obj.image_chosen}").url, height=600, width=600)
             return mark_safe(
                 '<div style="width: 600px">%s</div>'
                 % "".join(
@@ -55,6 +63,30 @@ class FrogImageAdmin(ModelAdmin):
                     ]
                 )
             )
+
+    @admin.action(description="Choose #1")
+    def choose_one(self, request, queryset):
+        for image in queryset:
+            image.choose_number(1)
+        self.message_user(request, "Number 1 chosen for selected images.")
+
+    @admin.action(description="Choose #2")
+    def choose_two(self, request, queryset):
+        for image in queryset:
+            image.choose_number(2)
+        self.message_user(request, "Number 2 chosen for selected images.")
+
+    @admin.action(description="Choose #3")
+    def choose_three(self, request, queryset):
+        for image in queryset:
+            image.choose_number(3)
+        self.message_user(request, "Number 3 chosen for selected images.")
+
+    @admin.action(description="Choose #4")
+    def choose_four(self, request, queryset):
+        for image in queryset:
+            image.choose_number(4)
+        self.message_user(request, "Number 4 chosen for selected images.")
 
 
 def preview_image(url, height=300, width=300):
