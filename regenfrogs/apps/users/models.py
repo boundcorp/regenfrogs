@@ -47,7 +47,7 @@ class User(TimestampMixin, MediumIDMixin, AbstractUser, MailMixin):
         view = FrameView.objects.create(
             user=user,
             frame_url=frame_url,
-            interaction=frame_interaction_json,
+            interaction=loaded,
             cast_hash=interaction and interaction.cast and interaction.cast.hash,
             cast_timestamp=interaction and interaction.cast and interaction.cast.timestamp,
         )
