@@ -55,8 +55,8 @@ class FrogImageAdmin(ModelAdmin):
     def get_references(self, obj):
         if obj.references:
             return mark_safe(
-                '<div style="width: 600px">%s</div>'
-                % "".join([preview_image(img, height=200, width=200) for img in obj.references])
+                '<div style="width: 400px">%s</div>'
+                % "".join([preview_image(img, height=100, width=100) for img in obj.references])
             )
 
     @admin.display(description="Generated Images")
