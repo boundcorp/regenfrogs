@@ -68,13 +68,14 @@ type MintedFrogSuccess {
 }
 
 type Mutation {
-  adoptFrog(fid: String!): AdoptFrogResult
+  adoptFrog(fid: Int!): AdoptFrogResult
   mintedFrog(input: MintedFrogInput): MintedFrogResult
   frameInteraction(frameUrl: String!, interactionJson: String!): InteractionResult
 }
 
 type Query {
-  frog(id: String!): FrogProfile
+  frogForVisitor(id: String!, fid: Int!): FrogProfile
+  frogByFid(fid: Int!): FrogProfile
   myProfile: UserProfile
 }
 

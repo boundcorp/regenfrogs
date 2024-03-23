@@ -27,11 +27,11 @@ class CATEGORY_CHOICES(models.TextChoices):
 
 
 def number_to_status(number: int):
-    if number > 40 and number < 60:
-        return STATUS_CHOICES.CONTENT
     if number < 40:
         return STATUS_CHOICES.SAD
-    if number > 60:
+    elif 40 < number < 60:
+        return STATUS_CHOICES.CONTENT
+    elif number > 60:
         return STATUS_CHOICES.HAPPY
 
 
@@ -123,6 +123,7 @@ class FrogProfile(TimestampMixin, MediumIDMixin):
     @classmethod
     def game_loop(cls):
         from django.conf import settings
+
         due_for_loop = cls.objects.filter(
             models.Q(last_loop__isnull=True)
             | models.Q(last_loop__lt=timezone.now() - timedelta(seconds=settings.FROG_LOOP_SECONDS)),

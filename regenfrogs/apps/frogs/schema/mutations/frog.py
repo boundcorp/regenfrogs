@@ -12,10 +12,9 @@ class AdoptFrogSuccess(graphene.ObjectType):
     frog = graphene.Field(types.FrogProfile)
 
 
-@validated
 class AdoptFrog(graphene.Mutation):
     class Arguments:
-        fid = graphene.String(required=True)
+        fid = graphene.Int(required=True)
 
     Output = success_or_error(AdoptFrogSuccess)
 

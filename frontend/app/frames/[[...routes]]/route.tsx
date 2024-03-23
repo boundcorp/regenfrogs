@@ -22,31 +22,29 @@ const app = new Frog({
     features: ['cast', 'interactor']
   })
 ).use(async (c, next) => {
-  console.log(JSON.stringify(c.var).replaceAll('"', '\\"'))
-  try {
-    console.log("analytics", c.req.url, c.var)
-    Object.keys(c.var).length && await apollo.mutate({
-      mutation: gql`
-          mutation FrameInteraction($frameUrl: String!, $interactionJson: String!) {
-              frameInteraction(frameUrl: $frameUrl, interactionJson: $interactionJson) {
-                  ... on InteractionSuccess {
-                      success
+    try {
+      Object.keys(c.var).length && await apollo.mutate({
+          mutation: gql`
+              mutation FrameInteraction($frameUrl: String!, $interactionJson: String!) {
+                  frameInteraction(frameUrl: $frameUrl, interactionJson: $interactionJson) {
+                      ... on InteractionSuccess {
+                          success
+                      }
                   }
               }
-          }
-      `,
-      variables: {
-        frameUrl: c.req.url,
-        interactionJson: JSON.stringify(c.var)
-      }
-    }) && console.log("ok", c.var.interactor?.fid)
-  } catch (e) {
-    console.error("analytics error", e)
-  }
+          `,
+        variables: {
+          frameUrl: c.req.url,
+          interactionJson: JSON.stringify(c.var)
+        }
+      }) && console.log("analytics ok", c.var.interactor?.fid)
+    } catch (e) {
+      console.error("analytics error", e)
+    }
 
-  // FROG WHYYYYYY
-  // We have to manually replace all occurrences of http(s)://*:*/frames with process.env.NEXT_PUBLIC_URL/frames
-  // because frog is ignoring our origin config, idgi
+    // FROG WHYYYYYY
+    // We have to manually replace all occurrences of http(s)://*:*/frames with process.env.NEXT_PUBLIC_URL/frames
+    // because frog is ignoring our origin config, idgi
 
   await next()
   c.res = new Response(fixUrls(await c.res.text()), {
@@ -78,7 +76,33 @@ const FROGS: Record<string, FrogProfile> = {
   "1": LIVE_FROG
 }
 
-app.frame('/', (f) => {
+async function loadFrogForFid(fid: number | undefined) {
+  if (!fid) {
+    return null
+  }
+    try {
+      console.log("Frog for", fid)
+        const frogStatus = fid ? await apollo.query({
+            query: gql`
+                query frogByFid($fid: Int!) {
+                    frogByFid(fid: $fid) {
+                        ... on FrogProfile {
+                            imageUrl
+                            status
+                        }
+                    }
+                }
+            `,
+          variables: {fid}
+        }) : null
+      console.log("Your frog is", frogStatus?.data)
+    } catch (e) {
+      console.error("Error fetching frog status", e)
+    }
+}
+
+app.frame('/', async (f) => {
+  const myFrog = await loadFrogForFid(f.var.interactor?.fid)
   return f.res({
     image: (
       <div
@@ -127,13 +151,37 @@ app.frame('/', (f) => {
     ),
     intents: [
       <Button.Redirect location="https://regenfrogs.xyz">regenfrogs.xyz</Button.Redirect>,
-      <Button value="frog" action="/how-it-works">Get my Frog</Button>,
+      <Button value="frog" action="/adopt">Get my Frog</Button>,
     ],
   })
 })
 
-app.frame("/how-it-works", (c) => {
+app.frame("/adopt", async (c) => {
+  const myFrog = await loadFrogForFid(c.var.interactor?.fid)
   const {buttonValue, inputText, status} = c
+    if (buttonValue == "adopt") {
+      const adopted = await apollo.mutate({
+            mutation: gql`
+                mutation adoptFrog($fid: Int!) {
+                    adoptFrog(fid: $fid) {
+                        ... on AdoptFrogSuccess {
+                            frog {
+                                id
+                                species
+                                imageUrl
+                                owner {
+                                    id
+                                    username
+                                }
+                            }
+                        }
+                    }
+                }
+            `,
+          variables: {fid: c.var.interactor?.fid}
+        })
+        console.log("Adopted", JSON.stringify(adopted?.data?.frog))
+    }
   return c.res({
     image: (
       <div
@@ -223,7 +271,7 @@ app.frame("/how-it-works", (c) => {
       </div>
     ),
     intents: [
-      <Button value="frog" action="/adopt">Adopt my Buddy</Button>,
+      <Button value="adopt" action="/adopt">Adopt my Buddy</Button>,
     ],
   })
 })
@@ -305,32 +353,6 @@ app.frame('/frog/mint', (f) => {
 
       <Button value="frog" action="/mint">Mint</Button>,
     ],
-  })
-})
-
-app.frame("/adopt", async (c) => {
-  const adopt = await apollo.mutate({
-    mutation: gql`
-        mutation AdoptFrog($fid: String!) {
-            adoptFrog(fid: $fid) {
-                id
-                species
-                imageUrl
-            }
-        }
-    `
-  })
-  return c.res({
-    image: (
-      adopt ? <div style={{color: 'white', display: 'flex', fontSize: 60}}>
-        adopted {adopt.species}
-      </div> : <div style={{color: 'white'}}>Frog not found</div>
-    ),
-    intents: [
-      <Button value="feed" action={`/frog/${id}/interact`}>🥗 Feed</Button>,
-      <Button value="play" action={`/frog/${id}/interact`}>🎮 Play</Button>,
-      <Button value="compliment" action={`/frog/${id}/interact`}>👍 Compliment</Button>,
-    ]
   })
 })
 
