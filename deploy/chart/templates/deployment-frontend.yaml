@@ -35,7 +35,10 @@ spec:
         - name: {{ $.Chart.Name }}
           image: "{{ $.Values.image.repository }}/release-frontend:{{ $.Values.image.tag }}"
           imagePullPolicy: "{{ $.Values.image.pullPolicy }}"
-          args: ["node", "server.js"]
+          command:
+            - bash
+            - -c
+            - echo NEYNAR_API_KEY=$NEYNAR_API_KEY > .env.production && node server.js
           env:
             - name: "SENTRY_RELEASE"
               value: {{ $.Values.image.tag }}

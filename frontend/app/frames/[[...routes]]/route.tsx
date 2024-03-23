@@ -1,16 +1,25 @@
 /** @jsxImportSource frog/jsx */
 
-import { Button, Frog, TextInput } from 'frog'
-import { devtools } from 'frog/dev'
-// import { neynar } from 'frog/hubs'
-import { handle } from 'frog/next'
-import { serveStatic } from 'frog/serve-static'
+import {Button, Frog} from 'frog'
+import {devtools} from 'frog/dev'
+import {handle} from 'frog/next'
+import {serveStatic} from 'frog/serve-static'
+import {neynar} from "frog/middlewares";
 
 const app = new Frog({
   assetsPath: '/',
   basePath: '/frames',
-  // Supply a Hub to enable frame verification.
-  // hub: neynar({ apiKey: 'NEYNAR_FROG_FM' })
+}).use(
+  neynar({
+    apiKey: process.env.NEYNAR_API_KEY as string,
+    features: ['cast', 'interactor']
+  })
+).use(async (c, next) => {
+  const res = await next()
+  console.log(process.env.NEYNAR_API_KEY)
+  console.log(`[${c.req.method}] ${c.req.url} => ${JSON.stringify(c.var)}`)
+
+  return res
 })
 
 // Uncomment to use Edge Runtime
@@ -91,7 +100,7 @@ app.frame('/intro', (f) => {
 })
 
 app.frame("/adopt", (c) => {
-  const { buttonValue, inputText, status } = c
+  const {buttonValue, inputText, status} = c
   return c.res({
     image: (
       <div
@@ -185,7 +194,6 @@ app.frame("/adopt", (c) => {
     ],
   })
 })
-
 
 
 const DEATH_REASONS = ["Accidentally overdosed on virtual caffeine after drinking too many digital energy drinks",
@@ -309,7 +317,7 @@ app.frame("/frog/:id/interact", (c) => {
   })
 })
 
-devtools(app, { serveStatic })
+devtools(app, {serveStatic})
 
 export const GET = handle(app)
 export const POST = handle(app)
