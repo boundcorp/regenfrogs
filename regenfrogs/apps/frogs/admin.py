@@ -55,17 +55,18 @@ class FrogImageAdmin(ModelAdmin):
     def get_references(self, obj):
         if obj.references:
             return mark_safe(
-                '<div style="width: 600px">%s</div>'
-                % "".join([preview_image(img, height=200, width=200) for img in obj.references])
+                '<div style="width: 400px">%s</div>'
+                % "".join([preview_image(img, height=100, width=100) for img in obj.references])
             )
 
     @admin.display(description="Generated Images")
     def get_generated(self, obj):
         if obj.generation_status == ImageGenerationStatus.COMPLETED:
+            wrapper = '<div style="width: 600px">%s</div>'
             if obj.image_chosen:
-                return preview_image(getattr(obj, f"image_{obj.image_chosen}").url, height=600, width=600)
+                return mark_safe(preview_image(getattr(obj, f"image_{obj.image_chosen}").url, height=600, width=600))
             return mark_safe(
-                '<div style="width: 600px">%s</div>'
+                wrapper
                 % "".join(
                     [
                         preview_image(img.url)
