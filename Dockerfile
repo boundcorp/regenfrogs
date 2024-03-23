@@ -147,7 +147,8 @@ ENV PYTHONSTARTUP=/.pythonrc
 
 RUN apt update -yq && apt install -yq \
     netcat gcc python3-dev libpq-dev libxml2-dev libxslt-dev \
-    libcurl4-openssl-dev libssl-dev libffi-dev curl
+    libcurl4-openssl-dev libssl-dev libffi-dev curl \
+    build-essential libagg-dev libpotrace-dev pkg-config
 
 RUN pip install --no-cache-dir --upgrade pipenv pip \
     && mkdir /app
@@ -156,12 +157,6 @@ RUN pip install --no-cache-dir --upgrade pipenv pip \
 # RUN apt install -yq libgdal-dev libproj-dev
 
 WORKDIR /app
-
-ADD Pipfile Pipfile.lock /app/
-
-# In dev, pipfile is installed with --system, so it persists even if we mount /app from outside
-RUN pipenv install --dev --system
-
 ENV NODE_VERSION=v18.17.1
 RUN apt install -y curl
 ENV NVM_DIR=/nvm
@@ -173,6 +168,12 @@ RUN . "$NVM_DIR/nvm.sh" && nvm alias default ${NODE_VERSION}
 ENV PATH="${NVM_DIR}/versions/node/${NODE_VERSION}/bin/:${PATH}"
 RUN node --version
 RUN npm --version
+
+
+
+# In dev, pipfile is installed with --system, so it persists even if we mount /app from outside
+ADD Pipfile Pipfile.lock /app/
+RUN pipenv install --dev --system
 RUN npm install --global yarn
 
 # symlink yarn because it won't be on the path when we change UID/GID!

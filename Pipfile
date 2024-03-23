@@ -49,13 +49,14 @@ django-q = "*"
 django-webpack-loader = "*"
 types-python-dateutil = "*"
 django-minio-storage = "*"
-django-storages = {extras = ["google"], version = "*"}
-django-anymail = {extras = ["sendgrid"], version = "*"}
+django-storages = {extras = ["google"] }
+django-anymail = {extras = ["sendgrid"] }
 openai = "*"
 pillow = "*"
 web3 = "*"
 python-dotenv = "*"
 sentry-sdk = "*"
+potracer = "*"
 
 [requires]
 python_version = "3.10"
