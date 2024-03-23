@@ -1,26 +1,12 @@
-import { getFrameMetadata } from 'frog/next'
-import type { Metadata } from 'next'
 import Typography from "@mui/material/Typography"
 import Card from "@mui/material/Card"
 import localFont from "next/font/local"
 
 import styles from './page.module.css'
 import Link from 'next/link'
-import {useMediaQuery} from "@mui/system";
-import {useTheme} from "@mui/material";
 
 const myFont = localFont({ src: './fonts/Catboo.ttf' })
 
-/*
-export async function generateMetadata(): Promise<Metadata> {
-  const frameTags = await getFrameMetadata(
-    `${process.env.VERCEL_URL || 'http://localhost:3000'}/api`,
-  )
-  return {
-    other: frameTags,
-  }
-}
-*/
 
 export default function Home() {
   return (
