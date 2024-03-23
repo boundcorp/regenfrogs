@@ -61,7 +61,7 @@ export default function Home() {
       </Grid>
 
       <div className={roboto.className}>
-        <Grid container alignItems={"stretch"} spacing={3}>
+        <Grid container alignItems={"stretch"} spacing={3} mb={"2em"}>
 
           <Grid item xs={12} md={6} lg={4}>
             <Card sx={{ padding: '3em', borderRadius: '15px' }}>
