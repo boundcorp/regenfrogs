@@ -31,6 +31,10 @@ type FrogProfile {
   sanity: Int!
   hunger: Int!
   status: FrogProfileStatus!
+  diedAt: DateTime
+  lastLoop: DateTime
+  nextLoop: DateTime
+  sanityCounter: Int!
   species: String
   hands: String
   clothes: String

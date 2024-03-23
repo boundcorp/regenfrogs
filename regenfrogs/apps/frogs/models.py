@@ -37,12 +37,14 @@ def number_to_status(number: int):
 
 def get_ages():
     from django.conf import settings
+
     return {
         "baby": 0,
         "young": 1 * settings.FROG_GROWTH_PERIOD_SECONDS,
         "adult": 10 * settings.FROG_GROWTH_PERIOD_SECONDS,
         "old": 30 * settings.FROG_GROWTH_PERIOD_SECONDS,
     }
+
 
 HUNGER_BY_AGES = {
     "baby": [1, 1, 2],

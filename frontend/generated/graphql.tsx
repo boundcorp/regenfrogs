@@ -36,6 +36,7 @@ export type FrogProfile = {
   alive: Scalars['Boolean'];
   clothes?: Maybe<Scalars['String']>;
   createdAt: Scalars['DateTime'];
+  diedAt?: Maybe<Scalars['DateTime']>;
   hands?: Maybe<Scalars['String']>;
   health: Scalars['Int'];
   hunger: Scalars['Int'];
@@ -43,12 +44,15 @@ export type FrogProfile = {
   imageUrl?: Maybe<Scalars['String']>;
   ipfsImageCid?: Maybe<Scalars['String']>;
   ipfsMetadataCid?: Maybe<Scalars['String']>;
+  lastLoop?: Maybe<Scalars['DateTime']>;
   mintedNftAddress?: Maybe<Scalars['String']>;
   mintedNftId?: Maybe<Scalars['Int']>;
   mintedNftReceipt?: Maybe<Scalars['String']>;
   mintedNftTxHash?: Maybe<Scalars['String']>;
+  nextLoop?: Maybe<Scalars['DateTime']>;
   owner: UserProfile;
   sanity: Scalars['Int'];
+  sanityCounter: Scalars['Int'];
   species?: Maybe<Scalars['String']>;
   status: FrogProfileStatus;
   updatedAt: Scalars['DateTime'];
