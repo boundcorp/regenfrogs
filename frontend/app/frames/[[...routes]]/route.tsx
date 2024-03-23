@@ -5,22 +5,55 @@ import {devtools} from 'frog/dev'
 import {handle} from 'frog/next'
 import {serveStatic} from 'frog/serve-static'
 import {neynar} from "frog/middlewares";
-console.log("LOADED", process.env.NEYNAR_API_KEY)
+import {fixUrls} from "@/src/urls";
+import {backendApolloClient} from "@/src/apollo-client";
+import {FrameInteractionDocument} from "@/generated/graphql";
+import {gql} from "@apollo/client";
+
+const apollo = backendApolloClient({})
+
 
 const app = new Frog({
   assetsPath: '/',
   basePath: '/frames',
+  origin: process.env.NEXT_PUBLIC_URL
 }).use(
   neynar({
     apiKey: process.env.NEYNAR_API_KEY as string,
     features: ['cast', 'interactor']
   })
 ).use(async (c, next) => {
-  const res = await next()
-  console.log(process.env.NEYNAR_API_KEY)
-  console.log(`[${c.req.method}] ${c.req.url} => ${JSON.stringify(c.var)}`)
+  console.log(JSON.stringify(c.var).replaceAll('"', '\\"'))
+  try {
+    const analytics = await apollo.mutate({
+      mutation: gql`
+          mutation FrameInteraction($frameUrl: String!, $interactionJson: String!) {
+              frameInteraction(frameUrl: $frameUrl, interactionJson: $interactionJson) {
+                  ... on InteractionSuccess {
+                      success
+                  }
+              }
+          }
+      `,
+      variables: {
+        frameUrl: c.req.url,
+        interactionJson: JSON.stringify(c.var)
+      }
+    })
+    console.log("analytics", analytics)
+  } catch (e) {
+    console.error("analytics error", e)
+  }
 
-  return res
+  // FROG WHYYYYYY
+  // We have to manually replace all occurrences of http(s)://*:*/frames with process.env.NEXT_PUBLIC_URL/frames
+  // because frog is ignoring our origin config, idgi
+
+  await next()
+  c.res = new Response(fixUrls(await c.res.text()), {
+    headers: c.res.headers,
+    status: c.res.status
+  })
 })
 
 // Uncomment to use Edge Runtime
@@ -46,7 +79,7 @@ const FROGS: Record<string, FrogProfile> = {
   "1": LIVE_FROG
 }
 
-app.frame('/intro', (f) => {
+app.frame('/', (f) => {
   return f.res({
     image: (
       <div
@@ -281,9 +314,9 @@ app.frame("/frog/:id", (c) => {
   const frog = FROGS?.[id]
   return c.res({
     image: (
-      frog ? <div style={{ color: 'white', display: 'flex', fontSize: 60 }}>
+      frog ? <div style={{color: 'white', display: 'flex', fontSize: 60}}>
         gm, {frog.status}
-      </div> : <div style={{ color: 'white' }}>Frog not found</div>
+      </div> : <div style={{color: 'white'}}>Frog not found</div>
     ),
     intents: [
       <Button value="feed" action={`/frog/${id}/interact`}>🥗 Feed</Button>,
@@ -296,23 +329,23 @@ app.frame("/frog/:id", (c) => {
 app.frame("/frog/:id/interact", (c) => {
   const id = c.req.param('id')
   const frog = FROGS?.[id]
-  const { buttonValue } = c
+  const {buttonValue} = c
   return c.res({
     image: (
-      frog ? buttonValue == "feed" ? 
-      <div style={{ color: 'white', display: 'flex', fontSize: 60 }}>
-        Your frog has been fed! Hunger level: {frog.hunger}
-      </div> : 
-        buttonValue == "play" ? 
-        <div style={{ color: 'white', display: 'flex', fontSize: 60 }}>
-          You played with your frog! Health level: ${frog.health}
-        </div> : 
-        buttonValue == "compliment" ? 
-        <div style={{ color: 'white', display: 'flex', fontSize: 60 }}>
-          Your frog has been complimented! Sanity level: ${frog.sanity}
-        </div> : 
-        <div style={{ color: 'white', display: 'flex', fontSize: 60 }}>No Action</div>
-         : <div style={{ color: 'white' }}>Frog not found</div>
+      frog ? buttonValue == "feed" ?
+          <div style={{color: 'white', display: 'flex', fontSize: 60}}>
+            Your frog has been fed! Hunger level: {frog.hunger}
+          </div> :
+          buttonValue == "play" ?
+            <div style={{color: 'white', display: 'flex', fontSize: 60}}>
+              You played with your frog! Health level: ${frog.health}
+            </div> :
+            buttonValue == "compliment" ?
+              <div style={{color: 'white', display: 'flex', fontSize: 60}}>
+                Your frog has been complimented! Sanity level: ${frog.sanity}
+              </div> :
+              <div style={{color: 'white', display: 'flex', fontSize: 60}}>No Action</div>
+        : <div style={{color: 'white'}}>Frog not found</div>
     ),
 
   })

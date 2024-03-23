@@ -9,12 +9,20 @@ import CardMedia from '@mui/material/CardMedia';
 import AppBar from '@mui/material/AppBar';
 import Box from '@mui/material/Box';
 import Toolbar from '@mui/material/Toolbar';
-import Typography from '@mui/material/Typography';
-import Button from '@mui/material/Button';
 import IconButton from '@mui/material/IconButton';
 import Tooltip from '@mui/material/Tooltip';
 import Image from 'next/image'
+import {getFrameMetadata} from "frog";
+import {Metadata} from "next";
+import {fixUrls} from "@/src/urls";
 
+
+export async function generateMetadata(): Promise<Metadata> {
+  const url = process.env.NEXT_PUBLIC_URL
+  console.log("Loading frame metadata", url)
+  const data = url ? await getFrameMetadata(`${url}/frames/intro`) : []
+  return {other: data.reduce((acc, {property, content}) => ({...acc, [property]: fixUrls(content)}), {})}
+}
 
 const myFont = localFont({ src: './fonts/Catboo.ttf' })
 

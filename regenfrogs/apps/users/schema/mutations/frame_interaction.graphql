@@ -1,0 +1,7 @@
+mutation frameInteraction($interactionJson: String!, $frameUrl: String!) {
+    frameInteraction(interactionJson: $interactionJson, frameUrl: $frameUrl) {
+        ... on InteractionSuccess {
+            success
+        }
+    }
+}

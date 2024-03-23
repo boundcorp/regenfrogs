@@ -60,6 +60,13 @@ export enum FrogProfileStatus {
   Sad = 'SAD'
 }
 
+export type InteractionResult = Error | InteractionSuccess;
+
+export type InteractionSuccess = {
+  __typename?: 'InteractionSuccess';
+  success?: Maybe<Scalars['Boolean']>;
+};
+
 export type MintedFrogInput = {
   address: Scalars['String'];
   id: Scalars['String'];
@@ -78,12 +85,19 @@ export type MintedFrogSuccess = {
 export type Mutation = {
   __typename?: 'Mutation';
   adoptFrog?: Maybe<AdoptFrogResult>;
+  frameInteraction?: Maybe<InteractionResult>;
   mintedFrog?: Maybe<MintedFrogResult>;
 };
 
 
 export type MutationAdoptFrogArgs = {
   input?: Maybe<AdoptFrogInput>;
+};
+
+
+export type MutationFrameInteractionArgs = {
+  frameUrl: Scalars['String'];
+  interactionJson: Scalars['String'];
 };
 
 
@@ -146,6 +160,14 @@ export type MintedFrogMutation = { __typename?: 'Mutation', mintedFrog?: Maybe<{
       { __typename?: 'FrogProfile' }
       & FrogProfileFragment
     )> }> };
+
+export type FrameInteractionMutationVariables = Exact<{
+  interactionJson: Scalars['String'];
+  frameUrl: Scalars['String'];
+}>;
+
+
+export type FrameInteractionMutation = { __typename?: 'Mutation', frameInteraction?: Maybe<{ __typename?: 'Error' } | { __typename?: 'InteractionSuccess', success?: Maybe<boolean> }> };
 
 export type MyProfileQueryVariables = Exact<{ [key: string]: never; }>;
 
@@ -292,6 +314,41 @@ export function useMintedFrogMutation(baseOptions?: Apollo.MutationHookOptions<M
 export type MintedFrogMutationHookResult = ReturnType<typeof useMintedFrogMutation>;
 export type MintedFrogMutationResult = Apollo.MutationResult<MintedFrogMutation>;
 export type MintedFrogMutationOptions = Apollo.BaseMutationOptions<MintedFrogMutation, MintedFrogMutationVariables>;
+export const FrameInteractionDocument = gql`
+    mutation frameInteraction($interactionJson: String!, $frameUrl: String!) {
+  frameInteraction(interactionJson: $interactionJson, frameUrl: $frameUrl) {
+    ... on InteractionSuccess {
+      success
+    }
+  }
+}
+    `;
+export type FrameInteractionMutationFn = Apollo.MutationFunction<FrameInteractionMutation, FrameInteractionMutationVariables>;
+
+/**
+ * __useFrameInteractionMutation__
+ *
+ * To run a mutation, you first call `useFrameInteractionMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useFrameInteractionMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [frameInteractionMutation, { data, loading, error }] = useFrameInteractionMutation({
+ *   variables: {
+ *      interactionJson: // value for 'interactionJson'
+ *      frameUrl: // value for 'frameUrl'
+ *   },
+ * });
+ */
+export function useFrameInteractionMutation(baseOptions?: Apollo.MutationHookOptions<FrameInteractionMutation, FrameInteractionMutationVariables>) {
+        return Apollo.useMutation<FrameInteractionMutation, FrameInteractionMutationVariables>(FrameInteractionDocument, baseOptions);
+      }
+export type FrameInteractionMutationHookResult = ReturnType<typeof useFrameInteractionMutation>;
+export type FrameInteractionMutationResult = Apollo.MutationResult<FrameInteractionMutation>;
+export type FrameInteractionMutationOptions = Apollo.BaseMutationOptions<FrameInteractionMutation, FrameInteractionMutationVariables>;
 export const MyProfileDocument = gql`
     query myProfile {
   myProfile {
