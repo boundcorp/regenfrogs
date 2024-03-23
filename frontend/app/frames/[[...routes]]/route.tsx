@@ -7,7 +7,7 @@ import {serveStatic} from 'frog/serve-static'
 import {neynar} from "frog/middlewares";
 import {fixUrls} from "@/src/urls";
 import {backendApolloClient} from "@/src/apollo-client";
-import {FrogAnalyticsDocument, MyProfileDocument} from "@/generated/graphql";
+import {FrameInteractionDocument} from "@/generated/graphql";
 
 const apollo = backendApolloClient({})
 
@@ -22,19 +22,17 @@ const app = new Frog({
     features: ['cast', 'interactor']
   })
 ).use(async (c, next) => {
+  console.log(JSON.stringify(c.var).replaceAll('"', '\\"'))
   try {
-    console.log("Apollo", process.env.APOLLO_BACKEND_URI)
-
-  const analytics = await apollo.query({
-    query: FrogAnalyticsDocument,
-    variables: {
-      interaction: c.var
-    }
-  })
-  console.log("analytics", analytics)
-
+    const analytics = await apollo.query({
+      query: FrameInteractionDocument,
+      variables: {
+        interactionJson: JSON.stringify(c.var)
+      }
+    })
+    console.log("analytics", analytics)
   } catch (e) {
-    console.error(e)
+    console.error("analytics error", e)
   }
 
   // FROG WHYYYYYY
@@ -307,9 +305,9 @@ app.frame("/frog/:id", (c) => {
   const frog = FROGS?.[id]
   return c.res({
     image: (
-      frog ? <div style={{ color: 'white', display: 'flex', fontSize: 60 }}>
+      frog ? <div style={{color: 'white', display: 'flex', fontSize: 60}}>
         gm, {frog.status}
-      </div> : <div style={{ color: 'white' }}>Frog not found</div>
+      </div> : <div style={{color: 'white'}}>Frog not found</div>
     ),
     intents: [
       <Button value="feed" action={`/frog/${id}/interact`}>🥗 Feed</Button>,
@@ -322,23 +320,23 @@ app.frame("/frog/:id", (c) => {
 app.frame("/frog/:id/interact", (c) => {
   const id = c.req.param('id')
   const frog = FROGS?.[id]
-  const { buttonValue } = c
+  const {buttonValue} = c
   return c.res({
     image: (
-      frog ? buttonValue == "feed" ? 
-      <div style={{ color: 'white', display: 'flex', fontSize: 60 }}>
-        Your frog has been fed! Hunger level: {frog.hunger}
-      </div> : 
-        buttonValue == "play" ? 
-        <div style={{ color: 'white', display: 'flex', fontSize: 60 }}>
-          You played with your frog! Health level: ${frog.health}
-        </div> : 
-        buttonValue == "compliment" ? 
-        <div style={{ color: 'white', display: 'flex', fontSize: 60 }}>
-          Your frog has been complimented! Sanity level: ${frog.sanity}
-        </div> : 
-        <div style={{ color: 'white', display: 'flex', fontSize: 60 }}>No Action</div>
-         : <div style={{ color: 'white' }}>Frog not found</div>
+      frog ? buttonValue == "feed" ?
+          <div style={{color: 'white', display: 'flex', fontSize: 60}}>
+            Your frog has been fed! Hunger level: {frog.hunger}
+          </div> :
+          buttonValue == "play" ?
+            <div style={{color: 'white', display: 'flex', fontSize: 60}}>
+              You played with your frog! Health level: ${frog.health}
+            </div> :
+            buttonValue == "compliment" ?
+              <div style={{color: 'white', display: 'flex', fontSize: 60}}>
+                Your frog has been complimented! Sanity level: ${frog.sanity}
+              </div> :
+              <div style={{color: 'white', display: 'flex', fontSize: 60}}>No Action</div>
+        : <div style={{color: 'white'}}>Frog not found</div>
     ),
 
   })

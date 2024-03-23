@@ -96,8 +96,8 @@ class Cast:
 
 @dataclass
 class FrameInteraction:
-    cast: Optional[Cast]
     interactor: Author
+    cast: Optional[Cast] = None
 
 
 def cast_from_bot(message, channel=None, reply=None, embed_urls=None):
