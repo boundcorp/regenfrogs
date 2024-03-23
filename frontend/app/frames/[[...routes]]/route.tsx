@@ -16,6 +16,7 @@ const app = new Frog({
   })
 ).use(async (c, next) => {
   const res = await next()
+  console.log(process.env.NEYNAR_API_KEY)
   console.log(`[${c.req.method}] ${c.req.url} => ${JSON.stringify(c.var)}`)
 
   return res
