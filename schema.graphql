@@ -1,8 +1,75 @@
 schema {
   query: Query
+  mutation: Mutation
+}
+
+input AdoptFrogInput {
+  id: String!
+  address: String!
+}
+
+union AdoptFrogResult = AdoptFrogSuccess | Error
+
+type AdoptFrogSuccess {
+  frog: FrogProfile
+  to: String
+}
+
+scalar DateTime
+
+type Error {
+  message: String!
+}
+
+type FrogProfile {
+  id: String!
+  createdAt: DateTime!
+  updatedAt: DateTime!
+  owner: UserProfile!
+  alive: Boolean!
+  health: Int!
+  sanity: Int!
+  hunger: Int!
+  status: FrogProfileStatus!
+  species: String
+  hands: String
+  clothes: String
+  ipfsImageCid: String
+  ipfsMetadataCid: String
+  mintedNftId: Int
+  mintedNftAddress: String
+  mintedNftTxHash: String
+  mintedNftReceipt: String
+  imageUrl: String
+}
+
+enum FrogProfileStatus {
+  HAPPY
+  CONTENT
+  SAD
+}
+
+input MintedFrogInput {
+  id: String!
+  nftId: Int!
+  address: String!
+  txHash: String!
+  receipt: String!
+}
+
+union MintedFrogResult = MintedFrogSuccess | Error
+
+type MintedFrogSuccess {
+  frog: FrogProfile
+}
+
+type Mutation {
+  adoptFrog(input: AdoptFrogInput): AdoptFrogResult
+  mintedFrog(input: MintedFrogInput): MintedFrogResult
 }
 
 type Query {
+  frog(id: String!): FrogProfile
   myProfile: UserProfile
 }
 
@@ -13,4 +80,5 @@ type UserProfile {
   email: String!
   isStaff: Boolean!
   id: String!
+  farcasterId: Int!
 }

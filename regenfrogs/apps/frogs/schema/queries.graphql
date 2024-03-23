@@ -1,0 +1,35 @@
+query frog($id: String!) {
+    frog(id: $id) {
+        ...FrogProfile
+
+    }
+}
+
+mutation adoptFrog($input: AdoptFrogInput!) {
+    adoptFrog(input: $input) {
+        __typename
+        ... on AdoptFrogSuccess {
+            frog {
+                ...FrogProfile
+            }
+        }
+        ... on Error {
+            message
+        }
+    }
+}
+
+mutation mintedFrog($input: MintedFrogInput!) {
+    mintedFrog(input: $input) {
+        __typename
+        ... on MintedFrogSuccess {
+            frog {
+                ...FrogProfile
+            }
+        }
+        ... on Error {
+            message
+        }
+    }
+}
+
