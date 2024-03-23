@@ -129,7 +129,6 @@ RUN adduser --system --uid 1001 nextjs
 COPY --from=frontend --chown=nextjs:nodejs /app/frontend/ /frontend
 WORKDIR /frontend
 
-USER nextjs
 EXPOSE 3000
 ENV PORT 3000
 CMD ["yarn", "start"]

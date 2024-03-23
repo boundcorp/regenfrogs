@@ -1,5 +1,20 @@
 schema {
   query: Query
+  mutation: Mutation
+}
+
+type Error {
+  message: String!
+}
+
+union InteractionResult = InteractionSuccess | Error
+
+type InteractionSuccess {
+  success: Boolean
+}
+
+type Mutation {
+  frameInteraction(interactionJson: String): InteractionResult
 }
 
 type Query {

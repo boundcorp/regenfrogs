@@ -5,22 +5,48 @@ import {devtools} from 'frog/dev'
 import {handle} from 'frog/next'
 import {serveStatic} from 'frog/serve-static'
 import {neynar} from "frog/middlewares";
-console.log("LOADED", process.env.NEYNAR_API_KEY)
+import {fixUrls} from "@/src/urls";
+import {backendApolloClient} from "@/src/apollo-client";
+import {FrogAnalyticsDocument, MyProfileDocument} from "@/generated/graphql";
+
+const apollo = backendApolloClient({})
+
 
 const app = new Frog({
   assetsPath: '/',
   basePath: '/frames',
+  origin: process.env.NEXT_PUBLIC_URL
 }).use(
   neynar({
     apiKey: process.env.NEYNAR_API_KEY as string,
     features: ['cast', 'interactor']
   })
 ).use(async (c, next) => {
-  const res = await next()
-  console.log(process.env.NEYNAR_API_KEY)
-  console.log(`[${c.req.method}] ${c.req.url} => ${JSON.stringify(c.var)}`)
+  try {
+    console.log("Apollo", process.env.APOLLO_BACKEND_URI)
 
-  return res
+  const analytics = await apollo.query({
+    query: FrogAnalyticsDocument,
+    variables: {
+      interaction: c.var
+    }
+  })
+  console.log("analytics", analytics)
+
+  } catch (e) {
+    console.error(e)
+  }
+
+  // FROG WHYYYYYY
+  // We have to manually replace all occurrences of http(s)://*:*/frames with process.env.NEXT_PUBLIC_URL/frames
+  // because frog is ignoring our origin config, idgi
+
+  await next()
+  console.log(`[${c.req.method}] ${c.req.url} => ${JSON.stringify(c.var)}`)
+  c.res = new Response(fixUrls(await c.res.text()), {
+    headers: c.res.headers,
+    status: c.res.status
+  })
 })
 
 // Uncomment to use Edge Runtime
@@ -37,7 +63,7 @@ const LIVE_FROG: FrogProfile = {
   status: "happy"
 }
 
-app.frame('/intro', (f) => {
+app.frame('/', (f) => {
   return f.res({
     image: (
       <div
