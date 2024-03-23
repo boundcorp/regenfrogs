@@ -6,6 +6,8 @@ import localFont from "next/font/local"
 
 import styles from './page.module.css'
 import Link from 'next/link'
+import {useMediaQuery} from "@mui/system";
+import {useTheme} from "@mui/material";
 
 const myFont = localFont({ src: './fonts/Catboo.ttf' })
 
@@ -23,7 +25,6 @@ export async function generateMetadata(): Promise<Metadata> {
 export default function Home() {
   return (
     <main className={styles.main}>
-
       <div className={myFont.className} style={{ fontSize: '10em' }}>REGENFROGS</div>
       <Card sx={{ padding: '1em', fontFamily: "Helvetiva Now Display" }}>
         <Typography variant="h3">Adopt Your Frog</Typography><Typography variant="h5" mb={"1em"}>Choose your virtual pet frog and begin your digital journey.</Typography>

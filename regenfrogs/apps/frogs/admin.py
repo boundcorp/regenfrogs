@@ -64,9 +64,7 @@ class FrogImageAdmin(ModelAdmin):
         if obj.generation_status == ImageGenerationStatus.COMPLETED:
             wrapper = '<div style="width: 600px">%s</div>'
             if obj.image_chosen:
-                return mark_safe(
-                    preview_image(getattr(obj, f"image_{obj.image_chosen}").url, height=600, width=600)
-                )
+                return mark_safe(preview_image(getattr(obj, f"image_{obj.image_chosen}").url, height=600, width=600))
             return mark_safe(
                 wrapper
                 % "".join(
