@@ -2,6 +2,7 @@ import "./globals.css";
 import {ThemeProvider} from '@mui/material/styles'
 import {AppRouterCacheProvider} from '@mui/material-nextjs/v13-appRouter';
 import theme from '../src/theme'
+import styles from "./page.module.css"
 
 export const metadata = {
   title: 'RegenFrogs',
@@ -21,7 +22,7 @@ export default function RootLayout({
       <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png"/>
       <link rel="manifest" href="/site.webmanifest"/>
     </head>
-    <body>
+    <body className={styles.main}>
     <AppRouterCacheProvider>
       <ThemeProvider theme={theme}>
         {children}
