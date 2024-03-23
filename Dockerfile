@@ -111,7 +111,7 @@ RUN yarn install
 FROM frontend-builder as frontend
 # frontend container has the fully built frontend app, this stage is too fat to deploy quickly!
 COPY frontend/ /app/frontend/
-RUN yarn
+RUN yarn && yarn build
 
 
 
