@@ -1,5 +1,3 @@
-import { getFrameMetadata } from 'frog/next'
-import type { Metadata } from 'next'
 import Grid from "@mui/material/Grid"
 import Card from "@mui/material/Card"
 import Container from "@mui/material/Container"
@@ -19,17 +17,6 @@ import Image from 'next/image'
 
 
 const myFont = localFont({ src: './fonts/Catboo.ttf' })
-
-/*
-export async function generateMetadata(): Promise<Metadata> {
-  const frameTags = await getFrameMetadata(
-    `${process.env.VERCEL_URL || 'http://localhost:3000'}/api`,
-  )
-  return {
-    other: frameTags,
-  }
-}
-*/
 
 const roboto = Roboto_Mono({
   subsets: ['latin'],
