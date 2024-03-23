@@ -13,4 +13,6 @@ class UserProfile(DjangoObjectType):
             "username",
             "first_name",
             "last_name",
+            "farcaster_id",
+            "frogs",
         ]

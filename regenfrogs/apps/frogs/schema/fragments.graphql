@@ -1,0 +1,21 @@
+fragment UserProfile on UserProfile {
+    id
+    firstName
+    lastName
+    email
+    username
+}
+
+fragment FrogProfile on FrogProfile {
+    id
+    status
+    health
+    sanity
+    hunger
+    alive
+    species
+    imageUrl
+    ipfsImageCid
+    ipfsMetadataCid
+    mintedNftId
+}
