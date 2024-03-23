@@ -19,7 +19,7 @@ class FrameInteractionMutation(graphene.Mutation):
 
     def mutate(self, info, frame_url, interaction_json):
         view, interaction = User.frame_view(frame_url, interaction_json)
-        print(view, view.user, interaction)
+        print(view, view.user)
         return InteractionSuccess(success=True)
 
 
