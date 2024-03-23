@@ -7,7 +7,6 @@ import {serveStatic} from 'frog/serve-static'
 import {neynar} from "frog/middlewares";
 import {fixUrls} from "@/src/urls";
 import {backendApolloClient} from "@/src/apollo-client";
-import {FrameInteractionDocument} from "@/generated/graphql";
 import {gql} from "@apollo/client";
 
 const apollo = backendApolloClient({})
@@ -26,7 +25,7 @@ const app = new Frog({
   console.log(JSON.stringify(c.var).replaceAll('"', '\\"'))
   try {
     console.log("analytics", c.req.url, c.var)
-    await apollo.mutate({
+    Object.keys(c.var).length && await apollo.mutate({
       mutation: gql`
           mutation FrameInteraction($frameUrl: String!, $interactionJson: String!) {
               frameInteraction(frameUrl: $frameUrl, interactionJson: $interactionJson) {
@@ -40,8 +39,7 @@ const app = new Frog({
         frameUrl: c.req.url,
         interactionJson: JSON.stringify(c.var)
       }
-    })
-    console.log("ok", c.var.interactor?.fid)
+    }) && console.log("ok", c.var.interactor?.fid)
   } catch (e) {
     console.error("analytics error", e)
   }

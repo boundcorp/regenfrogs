@@ -358,3 +358,7 @@ if "REDIS_URL" in os.environ:
     THUMBNAIL_REDIS_PASSWORD = redis_url.password or ""
     THUMBNAIL_REDIS_HOST = redis_url.hostname
     THUMBNAIL_REDIS_PORT = redis_url.port or 6379
+
+
+FROG_LOOP_SECONDS = int(os.environ.get("FROG_LOOP_SECONDS", 5))
+FROG_GROWTH_PERIOD_SECONDS = int(os.environ.get("FROG_GROWTH_PERIOD_SECONDS", 60))

@@ -9,6 +9,23 @@ from ...utils.ai_models import ImageGenerationStatus
 from . import models
 
 
+@register(models.FrogProfile)
+class FrogProfileAdmin(ModelAdmin):
+    list_display = ["id", "get_image", "created_at", "lifespan", "age", "alive", "hunger", "health", "sanity"]
+    search_fields = ["species", "user__username", "user__farcaster_id"]
+    readonly_fields = [
+        "image",
+        "species",
+        "hands",
+        "clothes",
+        "created_at",
+    ]
+
+    @admin.display(description="Image")
+    def get_image(self, obj):
+        return mark_safe(preview_image(obj.image.chosen_image.url))
+
+
 @register(models.FrogImage)
 class FrogImageAdmin(ModelAdmin):
     list_display = [
