@@ -19,8 +19,8 @@ class ImageGenerationStatus(models.TextChoices):
 def to_reference_url(url_or_image_prompt):
     if isinstance(url_or_image_prompt, str):
         return url_or_image_prompt
-    if getattr(url_or_image_prompt, "image_chosen", None):
-        return getattr(url_or_image_prompt, "image_chosen").url
+    if getattr(url_or_image_prompt, "ipfs_proxy_url", None):
+        return url_or_image_prompt.ipfs_proxy_url
 
 
 class ImagePromptMixin(TimestampMixin):
@@ -49,6 +49,7 @@ class ImagePromptMixin(TimestampMixin):
 
     class Meta:
         abstract = True
+        ordering = ["-created_at"]
 
     @classmethod
     def imagine(cls, prompt, references=None, begin_waiting=True):
