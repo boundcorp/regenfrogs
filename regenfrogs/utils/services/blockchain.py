@@ -7,7 +7,7 @@ from typing import Optional
 from eth_account.messages import encode_defunct
 from web3 import Web3
 
-NFT_ABI = json.load(open('contracts/out/RegenFrogs.sol/RegenFrogs.json'))['abi']
+NFT_ABI = json.load(open("contracts/out/RegenFrogs.sol/RegenFrogs.json"))["abi"]
 
 
 def sign_mint_request(to: str, nonce: int, uri: str, price_wei: int, expires: Optional[int] = None):
@@ -57,7 +57,7 @@ class Network(object):
             uri = frog.image.ipfs_url
         else:
             uri = "ipfs://debug.txt"
-        price_wei = 3000 * 10 ** 18 // 1_000_000
+        price_wei = 3000 * 10**18 // 1_000_000
 
         nonce = nonce or self.next_nonce(to)
         expires = expires or int(time.time() + 180)
