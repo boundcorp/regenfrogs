@@ -1,16 +1,24 @@
 /** @jsxImportSource frog/jsx */
 
-import { Button, Frog, TextInput } from 'frog'
-import { devtools } from 'frog/dev'
-// import { neynar } from 'frog/hubs'
-import { handle } from 'frog/next'
-import { serveStatic } from 'frog/serve-static'
+import {Button, Frog} from 'frog'
+import {devtools} from 'frog/dev'
+import {handle} from 'frog/next'
+import {serveStatic} from 'frog/serve-static'
+import {neynar} from "frog/middlewares";
 
 const app = new Frog({
   assetsPath: '/',
   basePath: '/frames',
-  // Supply a Hub to enable frame verification.
-  // hub: neynar({ apiKey: 'NEYNAR_FROG_FM' })
+}).use(
+  neynar({
+    apiKey: process.env.NEYNAR_API_KEY as string,
+    features: ['cast', 'interactor']
+  })
+).use(async (c, next) => {
+  const res = await next()
+  console.log(`[${c.req.method}] ${c.req.url} => ${JSON.stringify(c.var)}`)
+
+  return res
 })
 
 // Uncomment to use Edge Runtime
@@ -82,7 +90,7 @@ app.frame('/intro', (f) => {
 })
 
 app.frame("/adopt", (c) => {
-  const { buttonValue, inputText, status } = c
+  const {buttonValue, inputText, status} = c
   return c.res({
     image: (
       <div
@@ -178,7 +186,6 @@ app.frame("/adopt", (c) => {
 })
 
 
-
 const DEATH_REASONS = ["Accidentally overdosed on virtual caffeine after drinking too many digital energy drinks",
   "Got caught up in a heated debate with a virtual fly and forgot to eat",
   "Attempted a daring escape from its virtual terrarium and got lost in the digital jungle",
@@ -211,7 +218,7 @@ const DEATH_REASONS = ["Accidentally overdosed on virtual caffeine after drinkin
   "Became addicted to virtual reality shopping and spent all its virtual currency on virtual luxury items, forgetting to buy food"
 ]
 
-function choose(choices=DEATH_REASONS) {
+function choose(choices = DEATH_REASONS) {
   var index = Math.floor(Math.random() * choices.length);
   return choices[index];
 }
@@ -248,11 +255,11 @@ app.frame('/frog/mint', (f) => {
         >
           YOUR FROG DIED OF {choose()}
         </div>
-        
+
       </div>
     ),
     intents: [
-      
+
       <Button value="frog" action="/mint">Mint</Button>,
     ],
   })
@@ -262,14 +269,14 @@ app.frame("/frog/:id", (c) => {
   const id = c.req.param('id')
   return c.res({
     image: (
-      <div style={{ color: 'white', display: 'flex', fontSize: 60 }}>
+      <div style={{color: 'white', display: 'flex', fontSize: 60}}>
         gm, {id}
       </div>
     ),
   })
 })
 
-devtools(app, { serveStatic })
+devtools(app, {serveStatic})
 
 export const GET = handle(app)
 export const POST = handle(app)

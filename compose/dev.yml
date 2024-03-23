@@ -130,6 +130,8 @@ services:
       - DEVELOP_FRONTEND_PORT
       - APOLLO_BACKEND_URI=http://ingress:80/api/graphql/
       - NEXT_PUBLIC_APOLLO_URI=http://localhost:${DEVELOP_INGRESS_PORT}/api/graphql/
+      - NEXT_PUBLIC_URL=https://fbad06330a222f20.ngrok.app
+      - NEYNAR_API_KEY
       - ENV
       - DEBUG=true
       - SERVICE=backend
