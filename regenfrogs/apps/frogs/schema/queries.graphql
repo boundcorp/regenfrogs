@@ -5,8 +5,8 @@ query frog($id: String!) {
     }
 }
 
-mutation adoptFrog($input: AdoptFrogInput!) {
-    adoptFrog(input: $input) {
+mutation adoptFrog($fid: String!) {
+    adoptFrog(fid: $fid) {
         __typename
         ... on AdoptFrogSuccess {
             frog {

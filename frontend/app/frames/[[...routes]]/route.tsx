@@ -127,12 +127,12 @@ app.frame('/', (f) => {
     ),
     intents: [
       <Button.Redirect location="https://regenfrogs.xyz">regenfrogs.xyz</Button.Redirect>,
-      <Button value="frog" action="/adopt">Get my Frog</Button>,
+      <Button value="frog" action="/how-it-works">Get my Frog</Button>,
     ],
   })
 })
 
-app.frame("/adopt", (c) => {
+app.frame("/how-it-works", (c) => {
   const {buttonValue, inputText, status} = c
   return c.res({
     image: (
@@ -223,7 +223,7 @@ app.frame("/adopt", (c) => {
       </div>
     ),
     intents: [
-      <Button value="frog" action="/frog/:id">Adopt my Buddy</Button>,
+      <Button value="frog" action="/adopt">Adopt my Buddy</Button>,
     ],
   })
 })
@@ -305,6 +305,32 @@ app.frame('/frog/mint', (f) => {
 
       <Button value="frog" action="/mint">Mint</Button>,
     ],
+  })
+})
+
+app.frame("/adopt", async (c) => {
+  const adopt = await apollo.mutate({
+    mutation: gql`
+        mutation AdoptFrog($fid: String!) {
+            adoptFrog(fid: $fid) {
+                id
+                species
+                imageUrl
+            }
+        }
+    `
+  })
+  return c.res({
+    image: (
+      adopt ? <div style={{color: 'white', display: 'flex', fontSize: 60}}>
+        adopted {adopt.species}
+      </div> : <div style={{color: 'white'}}>Frog not found</div>
+    ),
+    intents: [
+      <Button value="feed" action={`/frog/${id}/interact`}>🥗 Feed</Button>,
+      <Button value="play" action={`/frog/${id}/interact`}>🎮 Play</Button>,
+      <Button value="compliment" action={`/frog/${id}/interact`}>👍 Compliment</Button>,
+    ]
   })
 })
 

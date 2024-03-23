@@ -12,17 +12,11 @@ export type Scalars = {
   DateTime: any;
 };
 
-export type AdoptFrogInput = {
-  address: Scalars['String'];
-  id: Scalars['String'];
-};
-
 export type AdoptFrogResult = AdoptFrogSuccess | Error;
 
 export type AdoptFrogSuccess = {
   __typename?: 'AdoptFrogSuccess';
   frog?: Maybe<FrogProfile>;
-  to?: Maybe<Scalars['String']>;
 };
 
 
@@ -95,7 +89,7 @@ export type Mutation = {
 
 
 export type MutationAdoptFrogArgs = {
-  input?: Maybe<AdoptFrogInput>;
+  fid: Scalars['String'];
 };
 
 
@@ -146,7 +140,7 @@ export type FrogQuery = { __typename?: 'Query', frog?: Maybe<(
   )> };
 
 export type AdoptFrogMutationVariables = Exact<{
-  input: AdoptFrogInput;
+  fid: Scalars['String'];
 }>;
 
 
@@ -239,8 +233,8 @@ export type FrogQueryHookResult = ReturnType<typeof useFrogQuery>;
 export type FrogLazyQueryHookResult = ReturnType<typeof useFrogLazyQuery>;
 export type FrogQueryResult = Apollo.QueryResult<FrogQuery, FrogQueryVariables>;
 export const AdoptFrogDocument = gql`
-    mutation adoptFrog($input: AdoptFrogInput!) {
-  adoptFrog(input: $input) {
+    mutation adoptFrog($fid: String!) {
+  adoptFrog(fid: $fid) {
     __typename
     ... on AdoptFrogSuccess {
       frog {
@@ -268,7 +262,7 @@ export type AdoptFrogMutationFn = Apollo.MutationFunction<AdoptFrogMutation, Ado
  * @example
  * const [adoptFrogMutation, { data, loading, error }] = useAdoptFrogMutation({
  *   variables: {
- *      input: // value for 'input'
+ *      fid: // value for 'fid'
  *   },
  * });
  */

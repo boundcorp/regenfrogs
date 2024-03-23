@@ -3,16 +3,10 @@ schema {
   mutation: Mutation
 }
 
-input AdoptFrogInput {
-  id: String!
-  address: String!
-}
-
 union AdoptFrogResult = AdoptFrogSuccess | Error
 
 type AdoptFrogSuccess {
   frog: FrogProfile
-  to: String
 }
 
 scalar DateTime
@@ -74,7 +68,7 @@ type MintedFrogSuccess {
 }
 
 type Mutation {
-  adoptFrog(input: AdoptFrogInput): AdoptFrogResult
+  adoptFrog(fid: String!): AdoptFrogResult
   mintedFrog(input: MintedFrogInput): MintedFrogResult
   frameInteraction(frameUrl: String!, interactionJson: String!): InteractionResult
 }
