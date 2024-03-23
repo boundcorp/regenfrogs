@@ -5,6 +5,7 @@ import {devtools} from 'frog/dev'
 import {handle} from 'frog/next'
 import {serveStatic} from 'frog/serve-static'
 import {neynar} from "frog/middlewares";
+console.log("LOADED", process.env.NEYNAR_API_KEY)
 
 const app = new Frog({
   assetsPath: '/',

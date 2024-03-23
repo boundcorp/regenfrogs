@@ -126,15 +126,13 @@ ENV NEXT_TELEMETRY_DISABLED 1
 RUN addgroup --system --gid 1001 nodejs
 RUN adduser --system --uid 1001 nextjs
 
-COPY --from=frontend --chown=nextjs:nodejs /app/frontend/.next/standalone /frontend
-COPY --from=frontend --chown=nextjs:nodejs /app/frontend/.next/static /frontend/.next/static
-COPY --from=frontend --chown=nextjs:nodejs /app/frontend/public /frontend/public
+COPY --from=frontend --chown=nextjs:nodejs /app/frontend/ /frontend
 WORKDIR /frontend
 
 USER nextjs
 EXPOSE 3000
 ENV PORT 3000
-CMD ["node", "server.js"]
+CMD ["yarn", "start"]
 
 #
 #
