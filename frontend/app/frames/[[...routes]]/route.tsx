@@ -19,12 +19,21 @@ const app = new Frog({
 type FrogProfile = {
   alive: boolean
   status: string
+  hunger: number
+  health: number
+  sanity: number
 
 }
 
 const LIVE_FROG: FrogProfile = {
   alive: true,
-  status: "happy"
+  status: "happy",
+  hunger: 90,
+  health: 85,
+  sanity: 100,
+}
+const FROGS: Record<string, FrogProfile> = {
+  "1": LIVE_FROG
 }
 
 app.frame('/intro', (f) => {
@@ -211,7 +220,7 @@ const DEATH_REASONS = ["Accidentally overdosed on virtual caffeine after drinkin
   "Became addicted to virtual reality shopping and spent all its virtual currency on virtual luxury items, forgetting to buy food"
 ]
 
-function choose(choices=DEATH_REASONS) {
+function choose(choices = DEATH_REASONS) {
   var index = Math.floor(Math.random() * choices.length);
   return choices[index];
 }
@@ -246,13 +255,13 @@ app.frame('/frog/mint', (f) => {
             display: "flex"
           }}
         >
-          YOUR FROG DIED OF {choose()}
+          YOUR FROG DIED FROM {choose()}
         </div>
-        
+
       </div>
     ),
     intents: [
-      
+
       <Button value="frog" action="/mint">Mint</Button>,
     ],
   })
@@ -260,12 +269,43 @@ app.frame('/frog/mint', (f) => {
 
 app.frame("/frog/:id", (c) => {
   const id = c.req.param('id')
+  const frog = FROGS?.[id]
   return c.res({
     image: (
-      <div style={{ color: 'white', display: 'flex', fontSize: 60 }}>
-        gm, {id}
-      </div>
+      frog ? <div style={{ color: 'white', display: 'flex', fontSize: 60 }}>
+        gm, {frog.status}
+      </div> : <div style={{ color: 'white' }}>Frog not found</div>
     ),
+    intents: [
+      <Button value="feed" action={`/frog/${id}/interact`}>🥗 Feed</Button>,
+      <Button value="play" action={`/frog/${id}/interact`}>🎮 Play</Button>,
+      <Button value="compliment" action={`/frog/${id}/interact`}>👍 Compliment</Button>,
+    ]
+  })
+})
+
+app.frame("/frog/:id/interact", (c) => {
+  const id = c.req.param('id')
+  const frog = FROGS?.[id]
+  const { buttonValue } = c
+  return c.res({
+    image: (
+      frog ? buttonValue == "feed" ? 
+      <div style={{ color: 'white', display: 'flex', fontSize: 60 }}>
+        Your frog has been fed! Hunger level: {frog.hunger}
+      </div> : 
+        buttonValue == "play" ? 
+        <div style={{ color: 'white', display: 'flex', fontSize: 60 }}>
+          You played with your frog! Health level: ${frog.health}
+        </div> : 
+        buttonValue == "compliment" ? 
+        <div style={{ color: 'white', display: 'flex', fontSize: 60 }}>
+          Your frog has been complimented! Sanity level: ${frog.sanity}
+        </div> : 
+        <div style={{ color: 'white', display: 'flex', fontSize: 60 }}>No Action</div>
+         : <div style={{ color: 'white' }}>Frog not found</div>
+    ),
+
   })
 })
 
