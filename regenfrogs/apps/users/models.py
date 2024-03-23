@@ -26,7 +26,7 @@ class User(TimestampMixin, MediumIDMixin, AbstractUser, MailMixin):
     def frame_view(cls, frame_url, frame_interaction_json):
         loaded = json.loads(frame_interaction_json)
         loaded["interactor"] = loaded.get("interactor") or {}
-        loaded["interactor"].pop("viewerContext")
+        loaded["interactor"].pop("viewerContext", "")
         interaction = FrameInteraction(
             interactor=Author(**loaded.get("interactor")),
             cast=loaded.get("cast") and Cast(**loaded["cast"]),

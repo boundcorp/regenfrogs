@@ -25,7 +25,8 @@ const app = new Frog({
 ).use(async (c, next) => {
   console.log(JSON.stringify(c.var).replaceAll('"', '\\"'))
   try {
-    const analytics = await apollo.mutate({
+    console.log("analytics", c.req.url, c.var)
+    await apollo.mutate({
       mutation: gql`
           mutation FrameInteraction($frameUrl: String!, $interactionJson: String!) {
               frameInteraction(frameUrl: $frameUrl, interactionJson: $interactionJson) {
@@ -40,7 +41,7 @@ const app = new Frog({
         interactionJson: JSON.stringify(c.var)
       }
     })
-    console.log("analytics", analytics)
+    console.log("ok", c.var.interactor?.fid)
   } catch (e) {
     console.error("analytics error", e)
   }
