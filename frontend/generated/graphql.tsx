@@ -30,7 +30,8 @@ export type Mutation = {
 
 
 export type MutationFrameInteractionArgs = {
-  interactionJson?: Maybe<Scalars['String']>;
+  frameUrl: Scalars['String'];
+  interactionJson: Scalars['String'];
 };
 
 export type Query = {
@@ -52,6 +53,7 @@ export type UserProfileFragment = { __typename?: 'UserProfile', id: string, firs
 
 export type FrameInteractionMutationVariables = Exact<{
   interactionJson: Scalars['String'];
+  frameUrl: Scalars['String'];
 }>;
 
 
@@ -75,8 +77,8 @@ export const UserProfileFragmentDoc = gql`
 }
     `;
 export const FrameInteractionDocument = gql`
-    mutation frameInteraction($interactionJson: String!) {
-  frameInteraction(interactionJson: $interactionJson) {
+    mutation frameInteraction($interactionJson: String!, $frameUrl: String!) {
+  frameInteraction(interactionJson: $interactionJson, frameUrl: $frameUrl) {
     ... on InteractionSuccess {
       success
     }
@@ -99,6 +101,7 @@ export type FrameInteractionMutationFn = Apollo.MutationFunction<FrameInteractio
  * const [frameInteractionMutation, { data, loading, error }] = useFrameInteractionMutation({
  *   variables: {
  *      interactionJson: // value for 'interactionJson'
+ *      frameUrl: // value for 'frameUrl'
  *   },
  * });
  */

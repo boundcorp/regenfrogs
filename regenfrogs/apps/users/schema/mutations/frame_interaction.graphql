@@ -1,5 +1,5 @@
-mutation frameInteraction($interactionJson: String!) {
-    frameInteraction(interactionJson: $interactionJson) {
+mutation frameInteraction($interactionJson: String!, $frameUrl: String!) {
+    frameInteraction(interactionJson: $interactionJson, frameUrl: $frameUrl) {
         ... on InteractionSuccess {
             success
         }

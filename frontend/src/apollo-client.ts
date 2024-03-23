@@ -1,11 +1,16 @@
 import {ApolloClient, ApolloLink, createHttpLink, InMemoryCache, NormalizedCacheObject} from "@apollo/client";
 import {GetServerSidePropsContext, NextPageContext} from "next";
-import {useMemo} from "react";
 import {setContext} from "@apollo/client/link/context";
+import { loadErrorMessages, loadDevMessages } from "@apollo/client/dev";
+
 
 let apolloClient: ApolloClient<NormalizedCacheObject>;
 export const APOLLO_BACKEND_URI = process.env.APOLLO_BACKEND_URI
-
+if (process.env.NODE_ENV !== 'production') {
+  // Adds messages only in a dev environment
+  loadDevMessages();
+  loadErrorMessages();
+}
 export const createApolloClient = (
     link: ApolloLink,
 ) => {

@@ -14,7 +14,7 @@ type InteractionSuccess {
 }
 
 type Mutation {
-  frameInteraction(interactionJson: String): InteractionResult
+  frameInteraction(frameUrl: String!, interactionJson: String!): InteractionResult
 }
 
 type Query {

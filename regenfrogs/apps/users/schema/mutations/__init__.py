@@ -2,9 +2,8 @@ import json
 
 import graphene
 
+from regenfrogs.apps.users.models import User
 from regenfrogs.utils.graphql import success_or_error
-from regenfrogs.utils.graphql.validator.decorators import validated
-from regenfrogs.utils.services.neynar import FrameInteraction
 
 
 class InteractionSuccess(graphene.ObjectType):
@@ -13,13 +12,14 @@ class InteractionSuccess(graphene.ObjectType):
 
 class FrameInteractionMutation(graphene.Mutation):
     class Arguments:
-        interaction_json = graphene.String()
+        frame_url = graphene.String(required=True)
+        interaction_json = graphene.String(required=True)
 
     Output = success_or_error(InteractionSuccess)
 
-    def mutate(self, info, interaction_json):
-        interaction = FrameInteraction(**json.loads(interaction_json))
-        print("interaction: ", interaction)
+    def mutate(self, info, frame_url, interaction_json):
+        view, interaction = User.frame_view(frame_url, interaction_json)
+        print(view, view.user, interaction)
         return InteractionSuccess(success=True)
 
 

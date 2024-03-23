@@ -8,6 +8,7 @@ import {neynar} from "frog/middlewares";
 import {fixUrls} from "@/src/urls";
 import {backendApolloClient} from "@/src/apollo-client";
 import {FrameInteractionDocument} from "@/generated/graphql";
+import {gql} from "@apollo/client";
 
 const apollo = backendApolloClient({})
 
@@ -24,9 +25,18 @@ const app = new Frog({
 ).use(async (c, next) => {
   console.log(JSON.stringify(c.var).replaceAll('"', '\\"'))
   try {
-    const analytics = await apollo.query({
-      query: FrameInteractionDocument,
+    const analytics = await apollo.mutate({
+      mutation: gql`
+          mutation FrameInteraction($frameUrl: String!, $interactionJson: String!) {
+              frameInteraction(frameUrl: $frameUrl, interactionJson: $interactionJson) {
+                  ... on InteractionSuccess {
+                      success
+                  }
+              }
+          }
+      `,
       variables: {
+        frameUrl: c.req.url,
         interactionJson: JSON.stringify(c.var)
       }
     })
@@ -40,7 +50,6 @@ const app = new Frog({
   // because frog is ignoring our origin config, idgi
 
   await next()
-  console.log(`[${c.req.method}] ${c.req.url} => ${JSON.stringify(c.var)}`)
   c.res = new Response(fixUrls(await c.res.text()), {
     headers: c.res.headers,
     status: c.res.status
