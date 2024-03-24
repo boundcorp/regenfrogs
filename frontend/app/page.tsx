@@ -20,7 +20,7 @@ import { fixUrls } from "@/src/urls";
 export async function generateMetadata(): Promise<Metadata> {
   const url = process.env.NEXT_PUBLIC_URL
   console.log("Loading frame metadata", url)
-  const data = url ? await getFrameMetadata(`${url}/frames/intro`) : []
+  const data = url ? await getFrameMetadata(`${url}/frames/`) : []
   return { other: data.reduce((acc, { property, content }) => ({ ...acc, [property]: fixUrls(content) }), {}) }
 }
 
