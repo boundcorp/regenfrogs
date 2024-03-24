@@ -16,19 +16,21 @@ import {Metadata} from "next";
 
 
 export async function generateMetadata(): Promise<Metadata> {
+  const url = process.env.NEXT_PUBLIC_URL
+  if(!url) return {}
   const data = {
     description: "Virtual pet frog",
     "fc:frame": "vNext",
     "fc:frame:image:aspect_ratio": "1.91:1",
-    "fc:frame:image": process.env.NEXT_PUBLIC_URL + "/frames/image?image=N4IglgzgohDGCGAHApgExALgC4CcCuyANCFvAOaYipgBuIxiOA9ohJqBFgJ4A2y7IeDzBkAdgEksyALZsMIWMlFSc9EACN4sANZlmeUennDRyeDgC0e%252BNSVYAFFiYACJ4md8AZlkLOAxADsAMzwAJwALABMvn4ArEEAHKiR0f6R4bGxAAwAjACUapo6ekwGqADKYABe-PI5WVkApM71TWrUEIg88FyUnnwAHmr9yAMAImA4yLBYYEyilLBMPHjSC8QjAwDqOEiUokwA7ruIagAWyCJnWJStjWoAVnicYJ5cAMLzUsqLdsiqxCkAywAEFhGJfsp-mpDmBUFgzrcGvcAL4o4iwM5gHioKYLDAAbVAkBgCBQRlwBEB5Eo1DoDGYrAEnF4tVASx4TFU8kOWKkwy%252BlRqmFCWQ2gu4fH2XOkQjUfCwKnKiC0YFEFHkFiyADospFYjJ5WrkAAJS5ka6YHLa8LEWU4MhqgAqLEwQTFIBVqGo6soWRakSyiCGxF5YCkyq0tU9Uwsxz2aIxWJxeMwBJAgF4NwAcO84AEpQADiUAAcgAxXMAeQL5Wc2ZAAF10cToHAkGhMJSiCQafI6WpGCw5BxJWyFMsuZQw-zxcohbUAGwezwS1nSnCynjy5CK-6R2BqjUgLW6-WG4gmU3my0Ya22kD2x2iF2nDDuhg2H2H-05QPBmF85A92jRhkDjE4QETBRk1xJQ0xAYs8BwLBEOQZx4GcahHVIHg0OkRAsXUMB4FEZxYQRZwuFKHBnE8HAwCUVAIDQwxnCWZQ6PUPApFcFxdjVZcpk4Vj5ggf4aHgWZ5m1BsUUbIA",
-    "og:image": process.env.NEXT_PUBLIC_URL + "/frames/image?image=N4IglgzgohDGCGAHApgExALgC4CcCuyANCFvAOaYipgBuIxiOA9ohJqBFgJ4A2y7IeDzBkAdgEksyALZsMIWMlFSc9EACN4sANZlmeUennDRyeDgC0e%252BNSVYAFFiYACJ4md8AZlkLOAxADsAMzwAJwALABMvn4ArEEAHKiR0f6R4bGxAAwAjACUapo6ekwGqADKYABe-PI5WVkApM71TWrUEIg88FyUnnwAHmr9yAMAImA4yLBYYEyilLBMPHjSC8QjAwDqOEiUokwA7ruIagAWyCJnWJStjWoAVnicYJ5cAMLzUsqLdsiqxCkAywAEFhGJfsp-mpDmBUFgzrcGvcAL4o4iwM5gHioKYLDAAbVAkBgCBQRlwBEB5Eo1DoDGYrAEnF4tVASx4TFU8kOWKkwy%252BlRqmFCWQ2gu4fH2XOkQjUfCwKnKiC0YFEFHkFiyADospFYjJ5WrkAAJS5ka6YHLa8LEWU4MhqgAqLEwQTFIBVqGo6soWRakSyiCGxF5YCkyq0tU9Uwsxz2aIxWJxeMwBJAgF4NwAcO84AEpQADiUAAcgAxXMAeQL5Wc2ZAAF10cToHAkGhMJSiCQafI6WpGCw5BxJWyFMsuZQw-zxcohbUAGwezwS1nSnCynjy5CK-6R2BqjUgLW6-WG4gmU3my0Ya22kD2x2iF2nDDuhg2H2H-05QPBmF85A92jRhkDjE4QETBRk1xJQ0xAYs8BwLBEOQZx4GcahHVIHg0OkRAsXUMB4FEZxYQRZwuFKHBnE8HAwCUVAIDQwxnCWZQ6PUPApFcFxdjVZcpk4Vj5ggf4aHgWZ5m1BsUUbIA",
+    "fc:frame:image": url + "/frames/image?image=N4IglgzgohDGCGAHApgExALgC4CcCuyANCFvAOaYipgBuIxiOA9ohJqBFgJ4A2y7IeDzBkAdgEksyALZsMIWMlFSc9EACN4sANZlmeUennDRyeDgC0e%252BNSVYAFFiYACJ4md8AZlkLOAxADsAMzwAJwALABMvn4ArEEAHKiR0f6R4bGxAAwAjACUapo6ekwGqADKYABe-PI5WVkApM71TWrUEIg88FyUnnwAHmr9yAMAImA4yLBYYEyilLBMPHjSC8QjAwDqOEiUokwA7ruIagAWyCJnWJStjWoAVnicYJ5cAMLzUsqLdsiqxCkAywAEFhGJfsp-mpDmBUFgzrcGvcAL4o4iwM5gHioKYLDAAbVAkBgCBQRlwBEB5Eo1DoDGYrAEnF4tVASx4TFU8kOWKkwy%252BlRqmFCWQ2gu4fH2XOkQjUfCwKnKiC0YFEFHkFiyADospFYjJ5WrkAAJS5ka6YHLa8LEWU4MhqgAqLEwQTFIBVqGo6soWRakSyiCGxF5YCkyq0tU9Uwsxz2aIxWJxeMwBJAgF4NwAcO84AEpQADiUAAcgAxXMAeQL5Wc2ZAAF10cToHAkGhMJSiCQafI6WpGCw5BxJWyFMsuZQw-zxcohbUAGwezwS1nSnCynjy5CK-6R2BqjUgLW6-WG4gmU3my0Ya22kD2x2iF2nDDuhg2H2H-05QPBmF85A92jRhkDjE4QETBRk1xJQ0xAYs8BwLBEOQZx4GcahHVIHg0OkRAsXUMB4FEZxYQRZwuFKHBnE8HAwCUVAIDQwxnCWZQ6PUPApFcFxdjVZcpk4Vj5ggf4aHgWZ5m1BsUUbIA",
+    "og:image": url + "/frames/image?image=N4IglgzgohDGCGAHApgExALgC4CcCuyANCFvAOaYipgBuIxiOA9ohJqBFgJ4A2y7IeDzBkAdgEksyALZsMIWMlFSc9EACN4sANZlmeUennDRyeDgC0e%252BNSVYAFFiYACJ4md8AZlkLOAxADsAMzwAJwALABMvn4ArEEAHKiR0f6R4bGxAAwAjACUapo6ekwGqADKYABe-PI5WVkApM71TWrUEIg88FyUnnwAHmr9yAMAImA4yLBYYEyilLBMPHjSC8QjAwDqOEiUokwA7ruIagAWyCJnWJStjWoAVnicYJ5cAMLzUsqLdsiqxCkAywAEFhGJfsp-mpDmBUFgzrcGvcAL4o4iwM5gHioKYLDAAbVAkBgCBQRlwBEB5Eo1DoDGYrAEnF4tVASx4TFU8kOWKkwy%252BlRqmFCWQ2gu4fH2XOkQjUfCwKnKiC0YFEFHkFiyADospFYjJ5WrkAAJS5ka6YHLa8LEWU4MhqgAqLEwQTFIBVqGo6soWRakSyiCGxF5YCkyq0tU9Uwsxz2aIxWJxeMwBJAgF4NwAcO84AEpQADiUAAcgAxXMAeQL5Wc2ZAAF10cToHAkGhMJSiCQafI6WpGCw5BxJWyFMsuZQw-zxcohbUAGwezwS1nSnCynjy5CK-6R2BqjUgLW6-WG4gmU3my0Ya22kD2x2iF2nDDuhg2H2H-05QPBmF85A92jRhkDjE4QETBRk1xJQ0xAYs8BwLBEOQZx4GcahHVIHg0OkRAsXUMB4FEZxYQRZwuFKHBnE8HAwCUVAIDQwxnCWZQ6PUPApFcFxdjVZcpk4Vj5ggf4aHgWZ5m1BsUUbIA",
     "og:title": "Frog Frame",
-    "fc:frame:post_url": process.env.NEXT_PUBLIC_URL + "/frames?initialPath=%252Fframes&amp;amp;previousButtonValues=%2523A__r%253Ahttps%253A%252F%252Fregenfrogs.xyz%252Cfrog",
+    "fc:frame:post_url": url + "/frames?initialPath=%252Fframes&amp;amp;previousButtonValues=%2523A__r%253Ahttps%253A%252F%252Fregenfrogs.xyz%252Cfrog",
     "fc:frame:button:1": "regenfrogs.xyz",
     "fc:frame:button:1:action": "post_redirect",
     "fc:frame:button:2": "Get my Frog",
     "fc:frame:button:2:action": "post",
-    "fc:frame:button:2:target": process.env.NEXT_PUBLIC_URL + "/frames/adopt?initialPath=%252Fframes&amp;amp;previousButtonValues=%2523A__r%253Ahttps%253A%252F%252Fregenfrogs.xyz%252Cfrog",
+    "fc:frame:button:2:target": url + "/frames/adopt?initialPath=%252Fframes&amp;amp;previousButtonValues=%2523A__r%253Ahttps%253A%252F%252Fregenfrogs.xyz%252Cfrog",
     "frog:version": "0.7.0",
   }
   return {other: data}
@@ -58,13 +60,13 @@ export default function Home() {
             <Box component="div" sx={{flexGrow: 1, display: 'flex'}}>
               <Image src="/images/refrog.png" width={70} height={70} alt="RegenFrogs Logo"/>
             </Box>
-            <Tooltip title="Farcaster"><Link href="https://warpcast.com" target={"_blank"}><IconButton
+            <Tooltip title="Farcaster"><Link href="https://warpcast.com/regenfrogs" target={"_blank"}><IconButton
               color="inherit"><Image src="/farcaster.png" width={30} height={30}
                                      alt="Farcaster Logo"/></IconButton></Link></Tooltip>
-            <Tooltip title="BaseScan"><Link href="https://basescan.org" target={"_blank"}><IconButton
+            <Tooltip title="BaseScan"><Link href={"https://basescan.org/address/"+process.env.NEXT_PUBLIC_BASE_MAINNET_NFT_ADDR} target={"_blank"}><IconButton
               color="inherit"><Image src="/basescan.png" width={30} height={30}
                                      alt="Basescan Logo"/></IconButton></Link></Tooltip>
-            <Tooltip title="OpenSea"><Link href="https://opensea.io" target={"_blank"}><IconButton
+            <Tooltip title="OpenSea"><Link href="https://opensea.io/assets/base/0x7cb26a92c048bd353acba27b15c7fc4677e9a9b9" target={"_blank"}><IconButton
               color="inherit"><Image src="/opensea.png" width={30} height={30} alt="OpenSea Logo"/></IconButton></Link></Tooltip>
           </Toolbar>
         </AppBar>
