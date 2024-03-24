@@ -363,31 +363,36 @@ app.frame("/frog/:id", (c) => {
   const frog = FROGS?.[id]
   return c.res({
     image: (
-      frog ? <div style={{color: 'white', display: 'flex', fontSize: 60}}>
+      frog ? 
+      <div style={{color: 'white', display: 'flex', fontSize: 60}}>
+
         <div style={{display: "flex",  width: "600px", height: "600px", border: "4px solid green", margin: "14px 10px 0" }}>
           <img src="/images/regenfrogs-frog1.jpg" alt="Frog Image" style={{ maxWidth: "600px"}} />
         </div>
+
         <div style={{display: "flex", flexDirection: "column", maxWidth: "500px", padding: "10px"}}>
-        <div style={{display: "flex", color: "white", marginBottom: "20px"}}>
-          Congratulations
-        </div>
-        <div style={{display: "flex", flexWrap: "nowrap"}}>
-        <div style={{display: "flex", color: "white", fontSize: 30, marginBottom: "20px"}}>
-          You adopted a {frog.species}
-        </div>
-        </div>
-        <div style={{display: "flex", color: "white"}}>
-          Health: {frog.health}
-        </div>
+          <div style={{display: "flex", color: "white", marginBottom: "20px"}}>
+            Congratulations
+          </div>
+          <div style={{display: "flex", flexWrap: "nowrap"}}>
+            <div style={{display: "flex", color: "white", fontSize: 30, marginBottom: "20px"}}>
+              You adopted a {frog.species}
+            </div>
+          </div>
+
+          <div style={{display: "flex", color: "white"}}>
+            Health: {frog.health}
+          </div>
         
-        <div style={{display: "flex", color: "white"}}>
-          Hunger: {frog.hunger}
+          <div style={{display: "flex", color: "white"}}>
+            Hunger: {frog.hunger}
+          </div>
+
+          <div style={{display: "flex", color: "white"}}>
+            Sanity: {frog.sanity}
+          </div>
+
         </div>
-        <div style={{display: "flex", color: "white"}}>
-          Sanity: {frog.sanity}
-        </div>
-        </div>
-        
       </div> : <div style={{color: 'white'}}>Frog not found</div>
     ),
     intents: [
@@ -405,17 +410,77 @@ app.frame("/frog/:id/interact", (c) => {
   return c.res({
     image: (
       frog ? buttonValue == "feed" ?
-          <div style={{color: 'white', display: 'flex', fontSize: 60}}>
-            Your frog has been fed! Hunger level: {frog.hunger}
-          </div> :
+
+      <div style={{color: 'white', display: 'flex', fontSize: 60}}>
+
+        <div style={{display: "flex",  width: "600px", height: "600px", border: "4px solid green", margin: "14px 10px 0" }}>
+          <img src="/images/regenfrogs-frog1.jpg" alt="Frog Image" style={{ maxWidth: "600px"}} />
+        </div>
+
+        <div style={{display: "flex", flexDirection: "column", maxWidth: "500px", padding: "10px"}}>
+          <div style={{display: "flex", color: "white", marginBottom: "20px"}}>
+            Your frog has been fed!
+          </div>
+          <div style={{display: "flex", color: "white"}}>
+            Hunger level: {frog.hunger}
+          </div>
+          <div style={{display: "flex"}}>
+            <div style={{display: "flex", color: "white", fontSize: 30}}>
+              You can interact again in 6 hours.
+            </div>
+          </div>
+        </div>
+        
+      </div>
+           :
           buttonValue == "play" ?
-            <div style={{color: 'white', display: 'flex', fontSize: 60}}>
-              You played with your frog! Health level: ${frog.health}
-            </div> :
+
+          <div style={{color: 'white', display: 'flex', fontSize: 60}}>
+
+            <div style={{display: "flex",  width: "600px", height: "600px", border: "4px solid green", margin: "14px 10px 0" }}>
+              <img src="/images/regenfrogs-frog1.jpg" alt="Frog Image" style={{ maxWidth: "600px"}} />
+            </div>
+
+            <div style={{display: "flex", flexDirection: "column", maxWidth: "500px", padding: "10px"}}>
+              <div style={{display: "flex", color: "white", marginBottom: "20px"}}>
+                You played with your frog! 
+              </div>
+              <div style={{display: "flex", color: "white"}}>
+                Health level: {frog.health}
+              </div>
+              <div style={{display: "flex"}}>
+                <div style={{display: "flex", color: "white", fontSize: 30}}>
+                  You can interact again in 6 hours.
+                </div>
+              </div>
+            </div>
+
+          </div>
+ :
             buttonValue == "compliment" ?
-              <div style={{color: 'white', display: 'flex', fontSize: 60}}>
-                Your frog has been complimented! Sanity level: ${frog.sanity}
-              </div> :
+
+            <div style={{color: 'white', display: 'flex', fontSize: 60}}>
+
+              <div style={{display: "flex",  width: "600px", height: "600px", border: "4px solid green", margin: "14px 10px 0" }}>
+                <img src="/images/regenfrogs-frog1.jpg" alt="Frog Image" style={{ maxWidth: "600px"}} />
+              </div>
+
+              <div style={{display: "flex", flexDirection: "column", maxWidth: "500px", padding: "10px"}}>
+                <div style={{display: "flex", color: "white", marginBottom: "20px"}}>
+                  Your frog has been complimented!
+                </div>
+                <div style={{display: "flex", color: "white"}}>
+                  Sanity level: {frog.sanity}
+                </div>
+                <div style={{display: "flex"}}>
+                  <div style={{display: "flex", color: "white", fontSize: 30}}>
+                    You can interact again in 6 hours.
+                  </div>
+                </div>
+              </div>
+
+            </div>
+              :
               <div style={{color: 'white', display: 'flex', fontSize: 60}}>No Action</div>
         : <div style={{color: 'white'}}>Frog not found</div>
     ),
