@@ -16,8 +16,12 @@ import {Metadata} from "next";
 
 
 export async function generateMetadata(): Promise<Metadata> {
+<<<<<<< HEAD
   const url = process.env.NEXT_PUBLIC_URL
   if(!url) return {}
+=======
+
+>>>>>>> 62226117768e6984375fb4b6aa3b86b549e7b810
   const data = {
     description: "Virtual pet frog",
     "fc:frame": "vNext",
@@ -109,20 +113,19 @@ export default function Home() {
             </Card>
           </Grid>
           <Grid item xs={12} lg={4}>
-            <Card sx={{padding: '2em', borderRadius: '15px'}}>
-              <h1 className={roboto.className} style={{fontWeight: 'bold', fontSize: '30px'}}>3. Mint NFTs</h1>
-              <div className={roboto.className} style={{fontSize: '25px', marginBottom: "1em", marginTop: "0.5em"}}>
-                All frogs go to heaven. Upon your frog&apos;s digital demise, mint commemorative NFTs to immortalize the
-                frog's glorious memory.
+            <Card sx={{ padding: '2em', borderRadius: '15px' }}>
+            <CardMedia component={"img"} image="/images/rainforest.jpeg" title="Rainforest" sx={{ height: 140, objectFit: "contain" }} />
+              <CardContent>
+              <h1 className={roboto.className} style={{ fontWeight: 'bold', fontSize: '30px' }}>3. Mint NFTs</h1>
+              <div className={roboto.className} style={{ fontSize: '25px', marginBottom: "1em", marginTop: "0.5em" }}>
+                All frogs go to heaven. Upon your frog&apos;s digital demise, mint commemorative NFTs to immortalize the frog's glorious memory.
               </div>
+              </CardContent>
             </Card>
           </Grid>
           <Grid item xs={12}>
-            <div className={roboto.className} style={{marginTop: '2em', fontSize: "30px", fontWeight: 'bold'}}>
-              We&apos;re proud to support the Rainforest Foundation, a committed advocate for the rights and
-              preservation efforts of Indigenous and traditional communities inhabiting the rainforests worldwide.
-              Proceeds from NFT minting will go towards their vital conservation efforts. Learn more at <Link
-              href={"https://rainforestfoundation.org"} target='__blank'>https://rainforestfoundation.org</Link>.
+            <div className={roboto.className} style={{ marginTop: '2em', fontSize: "30px", fontWeight: 'bold' }}>
+              We&apos;re proud to support the Rainforest Foundation, a committed advocate for the rights and preservation efforts of Indigenous and traditional communities inhabiting the rainforests worldwide.<br /><br />All proceeds from NFT minting will go towards their vital conservation efforts. Learn more at <Link href={"https://rainforestfoundation.org"} target='__blank'>https://rainforestfoundation.org</Link>.
             </div>
           </Grid>
         </Grid>
