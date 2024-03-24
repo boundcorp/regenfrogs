@@ -20,7 +20,7 @@ import { fixUrls } from "@/src/urls";
 export async function generateMetadata(): Promise<Metadata> {
   const url = process.env.NEXT_PUBLIC_URL
   console.log("Loading frame metadata", url)
-  const data = url ? await getFrameMetadata(`${url}/frames/`) : []
+  const data = !url?.includes("localhost") ? await getFrameMetadata(`${url}/frames/`) : []
   return { other: data.reduce((acc, { property, content }) => ({ ...acc, [property]: fixUrls(content) }), {}) }
 }
 
@@ -88,7 +88,7 @@ export default function Home() {
           </Grid>
           <Grid item xs={12} lg={4}>
             <Card sx={{ padding: '2em', borderRadius: '15px' }}>
-            <CardMedia component={"img"} image="/images/ranforest.jpeg" title="Rainforest" sx={{ height: 140, objectFit: "contain" }} />
+            <CardMedia component={"img"} image="/images/rainforest.jpeg" title="Rainforest" sx={{ height: 140, objectFit: "contain" }} />
               <CardContent>
               <h1 className={roboto.className} style={{ fontWeight: 'bold', fontSize: '30px' }}>3. Mint NFTs</h1>
               <div className={roboto.className} style={{ fontSize: '25px', marginBottom: "1em", marginTop: "0.5em" }}>
@@ -99,7 +99,7 @@ export default function Home() {
           </Grid>
           <Grid item xs={12}>
             <div className={roboto.className} style={{ marginTop: '2em', fontSize: "30px", fontWeight: 'bold' }}>
-              We&apos;re proud to support the Rainforest Foundation, a committed advocate for the rights and preservation efforts of Indigenous and traditional communities inhabiting the rainforests worldwide. Proceeds from NFT minting will go towards their vital conservation efforts. Learn more at <Link href={"https://rainforestfoundation.org"} target='__blank'>https://rainforestfoundation.org</Link>.
+              We&apos;re proud to support the Rainforest Foundation, a committed advocate for the rights and preservation efforts of Indigenous and traditional communities inhabiting the rainforests worldwide.<br /><br />All proceeds from NFT minting will go towards their vital conservation efforts. Learn more at <Link href={"https://rainforestfoundation.org"} target='__blank'>https://rainforestfoundation.org</Link>.
             </div>
           </Grid>
         </Grid>
