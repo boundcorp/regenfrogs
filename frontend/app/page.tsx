@@ -88,10 +88,13 @@ export default function Home() {
           </Grid>
           <Grid item xs={12} lg={4}>
             <Card sx={{ padding: '2em', borderRadius: '15px' }}>
+            <CardMedia component={"img"} image="/images/ranforest.jpeg" title="Rainforest" sx={{ height: 140, objectFit: "contain" }} />
+              <CardContent>
               <h1 className={roboto.className} style={{ fontWeight: 'bold', fontSize: '30px' }}>3. Mint NFTs</h1>
               <div className={roboto.className} style={{ fontSize: '25px', marginBottom: "1em", marginTop: "0.5em" }}>
                 All frogs go to heaven. Upon your frog&apos;s digital demise, mint commemorative NFTs to immortalize the frog's glorious memory.
               </div>
+              </CardContent>
             </Card>
           </Grid>
           <Grid item xs={12}>
