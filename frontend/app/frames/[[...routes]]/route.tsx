@@ -64,6 +64,7 @@ type FrogProfile = {
   hunger: number
   health: number
   sanity: number
+  species: string
 
 }
 
@@ -73,6 +74,7 @@ const LIVE_FROG: FrogProfile = {
   hunger: 90,
   health: 85,
   sanity: 100,
+  species: "Poison dart frog - Brightly colored with bold patterns like stripes, spots, or bands in combinations of black, blue, orange, or yellow"
 }
 const FROGS: Record<string, FrogProfile> = {
   "1": LIVE_FROG
@@ -314,7 +316,30 @@ app.frame("/frog/:id", (c) => {
   return c.res({
     image: (
       frog ? <div style={{color: 'white', display: 'flex', fontSize: 60}}>
-        gm, {frog.status}
+        <div style={{display: "flex",  width: "600px", height: "600px", border: "4px solid green", margin: "14px 10px 0" }}>
+          <img src="/images/regenfrogs-frog1.jpg" alt="Frog Image" style={{ maxWidth: "600px"}} />
+        </div>
+        <div style={{display: "flex", flexDirection: "column", maxWidth: "500px", padding: "10px"}}>
+        <div style={{display: "flex", color: "white", marginBottom: "20px"}}>
+          Congratulations
+        </div>
+        <div style={{display: "flex", flexWrap: "nowrap"}}>
+        <div style={{display: "flex", color: "white", fontSize: 30, marginBottom: "20px"}}>
+          You adopted a {frog.species}
+        </div>
+        </div>
+        <div style={{display: "flex", color: "white"}}>
+          Health: {frog.health}
+        </div>
+        
+        <div style={{display: "flex", color: "white"}}>
+          Hunger: {frog.hunger}
+        </div>
+        <div style={{display: "flex", color: "white"}}>
+          Sanity: {frog.sanity}
+        </div>
+        </div>
+        
       </div> : <div style={{color: 'white'}}>Frog not found</div>
     ),
     intents: [
