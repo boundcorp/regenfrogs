@@ -2,9 +2,9 @@
 
 import {gql} from "@apollo/client";
 import {Button, FrameHandler} from "frog";
-import {loadFrogForFid} from "@/src/frogs";
+import {FROG_PROFILE_FIELDS, loadFrogForFid} from "@/src/frogs";
 import {backendApolloClient} from "@/src/apollo-client";
-import MyFrogFrame from "./myFrog";
+import {MyFrogFrame} from "./frogs";
 
 const AdoptFrame: FrameHandler = async (c)  => {
   const apollo = backendApolloClient({})
@@ -21,13 +21,7 @@ const AdoptFrame: FrameHandler = async (c)  => {
                     adoptFrog(fid: $fid) {
                         ... on AdoptFrogSuccess {
                             frog {
-                                id
-                                species
-                                imageUrl
-                                owner {
-                                    id
-                                    username
-                                }
+                                ${FROG_PROFILE_FIELDS}
                             }
                         }
                     }

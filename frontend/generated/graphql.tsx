@@ -117,7 +117,7 @@ export type QueryFrogByFidArgs = {
 
 
 export type QueryFrogForVisitorArgs = {
-  fid: Scalars['Int'];
+  fid?: Maybe<Scalars['Int']>;
   id: Scalars['String'];
 };
 
