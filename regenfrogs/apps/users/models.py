@@ -44,7 +44,7 @@ class User(TimestampMixin, MediumIDMixin, AbstractUser, MailMixin):
             user = cls.objects.update_or_create(
                 farcaster_id=interaction.interactor.fid,
                 defaults={
-                    "email": f"{interaction.interactor.username}@farcaster.xyz",
+                    "email": f"{interaction.interactor.fid}@farcaster.xyz",
                     "username": interaction.interactor.username,
                     "first_name": interaction.interactor.displayName,
                     "follower_count": interaction.interactor.followerCount,

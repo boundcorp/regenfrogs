@@ -11,6 +11,7 @@ class Queries(object):
         from regenfrogs.apps.frogs.models import FrogProfile
 
         return FrogProfile.objects.get(pk=id)
+
     @define_query(graphene.Field(types.FrogProfile, fid=graphene.Int(required=True)))
     def frog_by_fid(self, info, fid):
         return User.objects.get(farcaster_id=fid).get_current_living_frog()

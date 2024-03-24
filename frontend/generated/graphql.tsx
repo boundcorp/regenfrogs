@@ -204,23 +204,19 @@ export const UserProfileFragmentDoc = gql`
     `;
 export const FrogProfileFragmentDoc = gql`
     fragment FrogProfile on FrogProfile {
-        owner {
-            id
-            username
-        }
-        id
-        status
-        health
-        sanity
-        hunger
-        alive
-        species
-        imageUrl
-        ipfsImageCid
-        ipfsMetadataCid
-        mintedNftId
-    }
-`;
+  id
+  status
+  health
+  sanity
+  hunger
+  alive
+  species
+  imageUrl
+  ipfsImageCid
+  ipfsMetadataCid
+  mintedNftId
+}
+    `;
 export const FrogForVisitorDocument = gql`
     query frogForVisitor($id: String!, $fid: Int!) {
   frogForVisitor(id: $id, fid: $fid) {
