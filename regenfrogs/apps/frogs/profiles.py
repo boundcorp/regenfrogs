@@ -122,7 +122,6 @@ SPECIES = [
     "Chiricahua Leopard Frog - Olive green with distinctive leopard-like spots and blotches.",
     "Long-Nose Horned Frog - With an enormous protruding snout and horn over each eye, camouflaged brown.",
     "Desert Rain Frog - Tan, mottled brown and pink like the desert sands it lives in.",
-
 ]
 
 HANDS = [

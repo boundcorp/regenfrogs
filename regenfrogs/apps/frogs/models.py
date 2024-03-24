@@ -281,9 +281,13 @@ class FrogImage(ImagePromptMixin, MediumIDMixin):
 
     @classmethod
     def not_yet_ready(cls):
-        return cls.objects.filter(generation_status__in=[ImageGenerationStatus.PENDING,
-                                                         ImageGenerationStatus.WAITING,
-                                                         ImageGenerationStatus.IN_PROGRESS])
+        return cls.objects.filter(
+            generation_status__in=[
+                ImageGenerationStatus.PENDING,
+                ImageGenerationStatus.WAITING,
+                ImageGenerationStatus.IN_PROGRESS,
+            ]
+        )
 
     @classmethod
     def random(cls, style, references=None):

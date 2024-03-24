@@ -22,6 +22,7 @@ class Queries(object):
     @define_query(graphene.Field(FrogForVisitor, id=graphene.String(required=True), fid=graphene.Int()))
     def frog_for_visitor(self, info, id, fid=None):
         from regenfrogs.apps.frogs.models import FrogProfile
+
         frog = FrogProfile.objects.get(pk=id)
         visitor = User.objects.get(farcaster_id=fid) if fid else None
         cooldown_until = visitor is not None and frog.get_cooldown_until(visitor)

@@ -163,28 +163,41 @@ app.frame("/frog/:id", async (c) => {
   const id = c.req.param('id')
   const {frog, visitor} = await loadFrogForVisitor(id, c.var.interactor?.fid)
   const refreshButton = <Button value="refresh" action={`/frog/${frog?.id}`}>Refresh</Button>
-  const intents = frog && visitor?.actionsAllowed ? [
+  const intents = frog && visitor?.actionsAllowed ? (
+    frog.alive ? [
       <Button value="feed" action={`/frog/${frog.id}/interact`}>🥗 Feed</Button>,
       <Button value="play" action={`/frog/${frog.id}/interact`}>🎮 Play</Button>,
-      <Button value="compliment" action={`/frog/${frog.id}/interact`}>👍 Compliment</Button>,
+      <Button value="hug" action={`/frog/${frog.id}/interact`}>💗 Hug</Button>,
       refreshButton
-  ] : [
-    refreshButton
-  ]
-
+    ] : [
+      <Button value="mint" action={`/frog/${frog.id}/mint`}>🪙 Mint</Button>,
+    ]
+  ) : [refreshButton]
   return c.res({
-    image: (
-      <FrogProfileFrame frog={frog || undefined}>
-        {visitor?.cooldownUntil ? (
-          <div style={{display: "flex", color: "white", fontSize: 30}}>
-            You can interact again in {Math.ceil(visitor.cooldownUntil / 60)} minutes.
+    image: (frog?.alive ?
+        <FrogProfileFrame frog={frog}>
+          <div style={{display: "flex", fontSize: 40, marginBottom: 20}}>I am a {frog?.species}</div>
+          {visitor?.cooldownUntil ? (
+            <div style={{display: "flex", color: "white", fontSize: 30}}>
+              You can interact again in {Math.ceil(visitor.cooldownUntil / 60)} minutes.
+            </div>
+          ) : visitor?.actionsAllowed ? (
+            <div style={{display: "flex", color: "white", fontSize: 30}}>
+              Help take care of {frog?.owner.firstName}'s frog!
+            </div>
+          ) : null}
+        </FrogProfileFrame>
+        : frog ? <FrogProfileFrame frog={frog}>
+          <div style={{display: "flex", flexDirection: "column", maxWidth: "500px", padding: "10px"}}>
+            <div style={{display: "flex", color: "white", marginBottom: "20px"}}>
+              ☠️ I&apos;m dead ☠️
+            </div>
+            <div style={{display: "flex", color: "white", fontSize: 30}}>
+              Mint a commemomorative NFT - all proceeds go towards the Rainforest Foundation.
+            </div>
+
           </div>
-        ) : visitor?.actionsAllowed ? (
-          <div style={{display: "flex", color: "white", fontSize: 30}}>
-            Help take care of {frog?.owner.firstName}'s frog!
-          </div>
-        ): null}
-      </FrogProfileFrame>
+        </FrogProfileFrame> : <div style={{color: 'white'}}>Frog not found</div>
     ),
     intents
   })
@@ -197,76 +210,46 @@ app.frame("/frog/:id/interact", async (c) => {
   return c.res({
     image: (
       frog ? buttonValue == "feed" ?
-
-      <div style={{color: 'white', display: 'flex', fontSize: 60}}>
-
-        <div style={{display: "flex",  width: "600px", height: "600px", border: "4px solid green", margin: "14px 10px 0" }}>
-          <img src="/images/regenfrogs-frog1.jpg" alt="Frog Image" style={{ maxWidth: "600px"}} />
-        </div>
-
-        <div style={{display: "flex", flexDirection: "column", maxWidth: "500px", padding: "10px"}}>
-          <div style={{display: "flex", color: "white", marginBottom: "20px"}}>
-            Your frog has been fed!
-          </div>
-          <div style={{display: "flex", color: "white"}}>
-            Hunger level: {frog.hunger}
-          </div>
-          <div style={{display: "flex"}}>
-            <div style={{display: "flex", color: "white", fontSize: 30}}>
-              You can interact again in 6 hours.
-            </div>
-          </div>
-        </div>
-        
-      </div>
-           :
-          buttonValue == "play" ?
-
-          <div style={{color: 'white', display: 'flex', fontSize: 60}}>
-
-            <div style={{display: "flex",  width: "600px", height: "600px", border: "4px solid green", margin: "14px 10px 0" }}>
-              <img src="/images/regenfrogs-frog1.jpg" alt="Frog Image" style={{ maxWidth: "600px"}} />
-            </div>
-
+          <FrogProfileFrame frog={frog}>
             <div style={{display: "flex", flexDirection: "column", maxWidth: "500px", padding: "10px"}}>
               <div style={{display: "flex", color: "white", marginBottom: "20px"}}>
-                You played with your frog! 
+                Nom nom nom. Thank you!
               </div>
-              <div style={{display: "flex", color: "white"}}>
-                Health level: {frog.health}
+              <div style={{display: "flex", color: "white", fontSize: 30}}>
+                You can come back in 6 hours.
               </div>
-              <div style={{display: "flex"}}>
-                <div style={{display: "flex", color: "white", fontSize: 30}}>
-                  You can interact again in 6 hours.
-                </div>
-              </div>
+
             </div>
+          </FrogProfileFrame>
 
-          </div>
- :
-            buttonValue == "compliment" ?
+          :
+          buttonValue == "play" ?
 
-            <div style={{color: 'white', display: 'flex', fontSize: 60}}>
-
-              <div style={{display: "flex",  width: "600px", height: "600px", border: "4px solid green", margin: "14px 10px 0" }}>
-                <img src="/images/regenfrogs-frog1.jpg" alt="Frog Image" style={{ maxWidth: "600px"}} />
-              </div>
-
+            <FrogProfileFrame frog={frog}>
               <div style={{display: "flex", flexDirection: "column", maxWidth: "500px", padding: "10px"}}>
                 <div style={{display: "flex", color: "white", marginBottom: "20px"}}>
-                  Your frog has been complimented!
+                  Thanks for playing with me!
                 </div>
-                <div style={{display: "flex", color: "white"}}>
-                  Sanity level: {frog.sanity}
-                </div>
-                <div style={{display: "flex"}}>
-                  <div style={{display: "flex", color: "white", fontSize: 30}}>
-                    You can interact again in 6 hours.
-                  </div>
+                <div style={{display: "flex", color: "white", fontSize: 30}}>
+                  You can come back in 6 hours.
                 </div>
               </div>
+            </FrogProfileFrame>
+            :
+            buttonValue == "hug" ?
 
-            </div>
+              <FrogProfileFrame frog={frog}>
+                <div style={{display: "flex", flexDirection: "column", maxWidth: "500px", padding: "10px"}}>
+                  <div style={{display: "flex", color: "white", marginBottom: "20px"}}>
+                    Thanks for the hug!
+                  </div>
+                  <div style={{display: "flex", color: "white", fontSize: 30}}>
+                    You can come back in 6 hours.
+                  </div>
+
+                </div>
+              </FrogProfileFrame>
+
               :
               <div style={{color: 'white', display: 'flex', fontSize: 60}}>No Action</div>
         : <div style={{color: 'white'}}>Frog not found</div>
