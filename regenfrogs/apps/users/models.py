@@ -39,15 +39,26 @@ class User(TimestampMixin, MediumIDMixin, AbstractUser, MailMixin):
         loaded["interactor"] = loaded.get("interactor") or {}
         loaded["interactor"].pop("viewerContext", "")
         interaction = FrameInteraction(
-            interactor=Author(**{k: v for k, v in loaded.get("interactor", {}).items() if k in
-            ["fid", "username", "displayName", "followerCount", "followingCount", "verifiedAddresses"]}),
-            cast=loaded.get("cast") and Cast(**{k: v for k, v in loaded.get("cast", {}).items() if
-                                              k in ["hash", "timestamp"]}),
+            interactor=Author(
+                **{
+                    k: v
+                    for k, v in loaded.get("interactor", {}).items()
+                    if k in ["fid", "username", "displayName", "followerCount", "followingCount", "verifiedAddresses"]
+                }
+            ),
+            cast=loaded.get("cast")
+                 and Cast(**{k: v for k, v in loaded.get("cast", {}).items() if k in ["hash", "timestamp", "text"]}),
         )
         if not interaction or not interaction.interactor or not interaction.interactor.fid:
             user = None
         else:
-            eth_addrs = interaction.interactor.verifiedAddresses and interaction.interactor.verifiedAddresses['ethAddresses'] or []
+            eth_addrs = (
+                    interaction.interactor.verifiedAddresses
+                    and interaction.interactor.verifiedAddresses["ethAddresses"]
+                    or []
+            )
+            if isinstance(eth_addrs, str):
+                eth_addrs = json.loads(eth_addrs)
             user = cls.objects.update_or_create(
                 farcaster_id=interaction.interactor.fid,
                 defaults={
@@ -56,7 +67,7 @@ class User(TimestampMixin, MediumIDMixin, AbstractUser, MailMixin):
                     "first_name": interaction.interactor.displayName,
                     "follower_count": interaction.interactor.followerCount,
                     "following_count": interaction.interactor.followingCount,
-                    "verified_address": eth_addrs and eth_addrs[-1]
+                    "verified_address": eth_addrs and eth_addrs[-1],
                 },
             )[0]
         view = FrameView.objects.create(
@@ -64,6 +75,7 @@ class User(TimestampMixin, MediumIDMixin, AbstractUser, MailMixin):
             frame_url=frame_url,
             interaction=loaded,
             cast_hash=interaction and interaction.cast and interaction.cast.hash,
+            cast_text=interaction and interaction.cast and interaction.cast.text,
             cast_timestamp=interaction and interaction.cast and interaction.cast.timestamp,
         )
         return view, interaction
@@ -74,4 +86,5 @@ class FrameView(TimestampMixin, UUIDMixin):
     frame_url = models.CharField(max_length=255)
     interaction = models.JSONField()
     cast_hash = models.CharField(max_length=255, null=True, blank=True)
+    cast_text = models.TextField(null=True, blank=True)
     cast_timestamp = models.DateTimeField(null=True, blank=True)

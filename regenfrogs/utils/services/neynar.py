@@ -71,21 +71,9 @@ class Replies:
 
 @dataclass
 class Cast:
-    object: str
     hash: str
-    threadHash: str
-    parentHash: Optional[str]
-    parentUrl: Optional[str]
-    rootParentUrl: Optional[str]
-    parentAuthor: Dict[str, Optional[int]]
-    author: Author
     text: str
     timestamp: str
-    embeds: List[Embed]
-    frames: List[Frame]
-    reactions: Reactions
-    replies: Replies
-    mentionedProfiles: List = field(default_factory=list)
 
 
 @dataclass

@@ -9,7 +9,12 @@ from django.db import models
 from django.utils import timezone
 from django_q.models import Schedule
 
-from regenfrogs.utils.ai_models import ImageGenerationStatus, ImagePromptMixin, ipfs_to_proxy_url, upload_to_ipfs
+from regenfrogs.utils.ai_models import (
+    ImageGenerationStatus,
+    ImagePromptMixin,
+    ipfs_to_proxy_url,
+    upload_to_ipfs,
+)
 from regenfrogs.utils.models import MediumIDMixin, TimestampMixin, UUIDMixin
 
 from . import profiles
@@ -228,8 +233,10 @@ class FrogProfile(TimestampMixin, MediumIDMixin):
         return self.get_mint_parameters(visitor)
 
     def get_mint_parameters(self, user):
-        from .schema.types import MintParameters
         from regenfrogs.utils.services.blockchain import CurrentNetwork
+
+        from .schema.types import MintParameters
+
         EXPIRY = 900
         MICROETH_PRICE = 1000
         if not self.ipfs_metadata_hash:
@@ -238,9 +245,9 @@ class FrogProfile(TimestampMixin, MediumIDMixin):
             self.save()
         return MintParameters(
             to=user.verified_address,
-            nonce=CurrentNetwork.next_nonce(),
+            nonce=CurrentNetwork.next_nonce(user.verified_address),
             uri=self.ipfs_metadata_url,
-            price_wei=MICROETH_PRICE * 10 ** 18 // 1_000_000,
+            price_wei=MICROETH_PRICE * 10**18 // 1_000_000,
             expires=int(timezone.now().timestamp() + EXPIRY),
         )
 

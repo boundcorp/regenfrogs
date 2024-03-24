@@ -35,7 +35,7 @@ class Queries(object):
                 user=visitor,
                 actions_allowed=actions_allowed,
                 cooldown_until=cooldown_until and (cooldown_until - timezone.now()).total_seconds(),
-                mint_parameters=frog.mint_for(visitor)
+                mint_parameters=frog.mint_for(visitor),
             ),
         )
 

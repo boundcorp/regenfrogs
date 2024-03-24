@@ -22,13 +22,16 @@ def to_reference_url(url_or_image_prompt):
     if getattr(url_or_image_prompt, "ipfs_proxy_url", None):
         return url_or_image_prompt.ipfs_proxy_url
 
+
 def ipfs_to_proxy_url(ipfs_url):
     return f"https://ipfs.io/ipfs/{ipfs_url.split('ipfs://')[1]}"
+
 
 def upload_to_ipfs(name, file):
     import json
 
     import requests
+
     files = {
         "file": (name, file),
     }
