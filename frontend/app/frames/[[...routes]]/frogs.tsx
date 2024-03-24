@@ -6,7 +6,12 @@ import {FrogProfileFragment} from "@/generated/graphql";
 import React from "react";
 
 
-export const FrogProfileFrame = ({children, frog}: {children: React.ReactNode, frog: FrogProfileFragment | undefined}) => {
+export const FrogProfileFrame = ({children, frog, hideStats}: {
+  children: React.ReactNode,
+  frog: FrogProfileFragment | undefined,
+  hideStats?: boolean
+}) => {
+  console.log("Rendering", frog?.imageUrl)
   return frog ?
     <div style={{color: 'white', display: 'flex', fontSize: 60}}>
       <div style={{
@@ -15,26 +20,30 @@ export const FrogProfileFrame = ({children, frog}: {children: React.ReactNode, f
         height: "600px",
         margin: "14px 10px 0"
       }}>
-        <img src={frog.imageUrl || ""} alt="Frog Image" height={600} width={600} />
+        <img src={frog.imageUrl || ""} alt="Frog Image" height={600} width={600}/>
       </div>
 
       <div style={{display: "flex", flexDirection: "column", maxWidth: "500px", padding: "10px"}}>
         {children}
 
-        <div style={{display: "flex", color: "white"}}>
-          Health: {frog.health || "0"}
-        </div>
+        {hideStats ? <></> :
+          <div style={{display: "flex", color: "white"}}>
+            Health: {frog.health || "0"}
+          </div>}
 
-        <div style={{display: "flex", color: "white"}}>
-          Hunger: {frog.hunger || "0"}
-        </div>
+        {hideStats ? <></> :
+          <div style={{display: "flex", color: "white"}}>
+            Hunger: {frog.hunger || "0"}
+          </div>}
 
-        <div style={{display: "flex", color: "white"}}>
-          Sanity: {frog.sanity || "0"}
-        </div>
+        {hideStats ? <></> :
+          <div style={{display: "flex", color: "white"}}>
+            Sanity: {frog.sanity || "0"}
+          </div>}
 
       </div>
-    </div> : <div style={{color: 'white', background: 'black', fontSize: '60', width: "100%", height: "100%"}}>Frog not found</div>
+    </div> : <div style={{color: 'white', background: 'black', fontSize: '60', width: "100%", height: "100%"}}>Frog not
+      found</div>
 
 }
 

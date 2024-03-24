@@ -162,7 +162,7 @@ app.frame('/frog/mint', (f) => {
 app.frame("/frog/:id", async (c) => {
   const id = c.req.param('id')
   const {frog, visitor} = await loadFrogForVisitor(id, c.var.interactor?.fid)
-  const refreshButton = <Button value="refresh" action={`/frog/${frog?.id}`}>Refresh</Button>
+  const refreshButton = <Button value="refresh" action={`/frog/${frog?.id}`}>Check Status</Button>
   const intents = frog && visitor?.actionsAllowed ? (
     frog.alive ? [
       <Button value="feed" action={`/frog/${frog.id}/interact`}>🥗 Feed</Button>,
@@ -173,9 +173,10 @@ app.frame("/frog/:id", async (c) => {
       <Button value="mint" action={`/frog/${frog.id}/mint`}>🪙 Mint</Button>,
     ]
   ) : [refreshButton]
+  console.log(visitor)
   return c.res({
     image: (frog?.alive ?
-        <FrogProfileFrame frog={frog}>
+        <FrogProfileFrame frog={frog} hideStats={!visitor?.user?.id}>
           <div style={{display: "flex", fontSize: 40, marginBottom: 20}}>I am a {frog?.species}</div>
           {visitor?.cooldownUntil ? (
             <div style={{display: "flex", color: "white", fontSize: 30}}>
@@ -183,9 +184,9 @@ app.frame("/frog/:id", async (c) => {
             </div>
           ) : visitor?.actionsAllowed ? (
             <div style={{display: "flex", color: "white", fontSize: 30}}>
-              Help take care of {frog?.owner.firstName}'s frog!
+              Help take care of {frog?.owner?.firstName}'s frog!
             </div>
-          ) : null}
+          ) : <></>}
         </FrogProfileFrame>
         : frog ? <FrogProfileFrame frog={frog}>
           <div style={{display: "flex", flexDirection: "column", maxWidth: "500px", padding: "10px"}}>

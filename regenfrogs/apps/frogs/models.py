@@ -111,8 +111,6 @@ class FrogProfile(TimestampMixin, MediumIDMixin):
                 raise Exception("No available images to adopt from")
             if not image.image_chosen:
                 image.choose_number(1)
-                if settings.DEBUG:
-                    image.pin_chosen_to_pinata()
 
         return cls.objects.create(
             image=image, owner=owner, species=image.species, hands=image.hands, clothes=image.clothes
@@ -242,6 +240,8 @@ class FrogProfile(TimestampMixin, MediumIDMixin):
     @property
     def image_url(self):
         if self.image:
+            if settings.DEBUG and not self.image.ipfs_hash:
+                self.image.pin_chosen_to_pinata()
             if self.image.ipfs_hash:
                 return self.image.ipfs_proxy_url
             return self.image.chosen_image.url

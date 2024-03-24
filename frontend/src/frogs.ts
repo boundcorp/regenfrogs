@@ -2,8 +2,8 @@ import {backendApolloClient} from "@/src/apollo-client";
 import {gql} from "@apollo/client";
 import {FrogForVisitor, FrogForVisitorQueryResult, FrogProfileFragment} from "@/generated/graphql";
 
-export const FROG_PROFILE_FIELDS = 'id species hands clothes alive imageUrl status health hunger sanity'
-export const FROG_VISITOR_FIELDS = 'allowedActions cooldown'
+export const FROG_PROFILE_FIELDS = 'id species hands clothes alive imageUrl status health hunger sanity owner {id firstName username farcasterId}'
+export const FROG_VISITOR_FIELDS = 'actionsAllowed cooldownUntil user { id username firstName farcasterId }'
 
 export async function loadFrogForFid(fid: number | undefined): Promise<FrogProfileFragment | undefined> {
   const apollo = backendApolloClient({})
@@ -36,17 +36,12 @@ export async function loadFrogForVisitor(id: string, fid: number | undefined): P
                 query: gql`
                     query frogByFid($id: String!, $fid: Int) {
                         frogForVisitor(id: $id, fid: $fid) {
-                            visitor {
-                                user {
-                                    id
-                                }
-                                ${FROG_VISITOR_FIELDS}
-                            }
-                            frog {
-                                ... on FrogProfile {
-                                    ${FROG_PROFILE_FIELDS}
-                                }
-                            }
+                              visitor {
+                                  ${FROG_VISITOR_FIELDS}
+                              }
+                              frog {
+                                  ${FROG_PROFILE_FIELDS}
+                              }
                         }
                     }
                 `,
