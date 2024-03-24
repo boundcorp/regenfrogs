@@ -15,22 +15,22 @@ export const FrogProfileFrame = ({children, frog}: {children: React.ReactNode, f
         height: "600px",
         margin: "14px 10px 0"
       }}>
-        <img src="/images/regenfrogs-frog1.jpg" alt="Frog Image" style={{maxWidth: "600px"}}/>
+        <img src={frog.imageUrl || ""} alt="Frog Image" height={600} width={600} />
       </div>
 
       <div style={{display: "flex", flexDirection: "column", maxWidth: "500px", padding: "10px"}}>
         {children}
 
         <div style={{display: "flex", color: "white"}}>
-          Health: {frog.health}
+          Health: {frog.health || "0"}
         </div>
 
         <div style={{display: "flex", color: "white"}}>
-          Hunger: {frog.hunger}
+          Hunger: {frog.hunger || "0"}
         </div>
 
         <div style={{display: "flex", color: "white"}}>
-          Sanity: {frog.sanity}
+          Sanity: {frog.sanity || "0"}
         </div>
 
       </div>
