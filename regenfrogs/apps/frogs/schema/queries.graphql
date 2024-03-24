@@ -1,7 +1,19 @@
+fragment VisitorResponse on VisitorResponse {
+    actionsAllowed
+    cooldownUntil
+    user {
+        ...UserProfile
+    }
+
+}
 query frogForVisitor($id: String!, $fid: Int!) {
     frogForVisitor(id: $id, fid: $fid) {
-        ...FrogProfile
-
+        frog {
+            ...FrogProfile
+        }
+        visitor {
+            ...VisitorResponse
+        }
     }
 }
 

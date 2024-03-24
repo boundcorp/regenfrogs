@@ -3,6 +3,7 @@ import random
 from datetime import timedelta
 from io import StringIO
 
+from django.conf import settings
 from django.core.validators import MaxValueValidator, MinValueValidator
 from django.db import models
 from django.utils import timezone
@@ -93,17 +94,25 @@ class FrogProfile(TimestampMixin, MediumIDMixin):
     minted_nft_receipt = models.TextField(null=True, blank=True)
 
     @classmethod
+    def ensure(cls, wanted=20, add=5):
+        available = FrogImage.available().count()
+        in_progress = FrogImage.not_yet_ready().count()
+        print("Frogs available:", available, "in_progress:", in_progress, "wanted:", wanted)
+        if (available + in_progress) < wanted:
+            print("Issuing", add, "new frogs")
+            for i in range(add):
+                FrogImage.random(FrogStyle.DRAWING)
+
+    @classmethod
     def adopt_from_image(cls, owner, image=None):
         if not image:
-            image = (
-                FrogImage.objects.filter(frogprofile=None, generation_status=ImageGenerationStatus.COMPLETED)
-                .order_by("?")
-                .first()
-            )
+            image = FrogImage.available().order_by("?").first()
             if not image:
                 raise Exception("No available images to adopt from")
             if not image.image_chosen:
                 image.choose_number(1)
+                if settings.DEBUG:
+                    image.pin_chosen_to_pinata()
 
         return cls.objects.create(
             image=image, owner=owner, species=image.species, hands=image.hands, clothes=image.clothes
@@ -134,6 +143,17 @@ class FrogProfile(TimestampMixin, MediumIDMixin):
                 frog.perform_loop()
             except Exception as e:
                 print("Failed to perform loop", frog.id, e)
+
+    def get_cooldown_until(self, user):
+        if user == self.owner:
+            cooldown = timedelta(hours=2)
+        else:
+            cooldown = timedelta(hours=1)
+        latest_log = self.logs.filter(actor=user).first()
+        if latest_log:
+            return latest_log.created_at + cooldown
+        else:
+            return timezone.now()
 
     def perform_loop(self):
         print("  processing frog loop", self.id, self.age, self.health, self.sanity, self.hunger)
@@ -221,7 +241,10 @@ class FrogProfile(TimestampMixin, MediumIDMixin):
 
     @property
     def image_url(self):
-        return self.image.chosen_image.url
+        if self.image:
+            if self.image.ipfs_hash:
+                return self.image.ipfs_proxy_url
+            return self.image.chosen_image.url
 
     def upload_to_ipfs(self):
         from regenfrogs.utils.services.ipfs import upload_to_ipfs
@@ -252,9 +275,15 @@ class FrogImage(ImagePromptMixin, MediumIDMixin):
     hands = models.TextField(null=True, blank=True)
     clothes = models.TextField(null=True, blank=True)
 
-    def choose_number(self, number):
-        super().choose_number(number)
-        self.pin_chosen_to_pinata()
+    @classmethod
+    def available(cls):
+        return cls.objects.filter(frogprofile=None, generation_status=ImageGenerationStatus.COMPLETED)
+
+    @classmethod
+    def not_yet_ready(cls):
+        return cls.objects.filter(generation_status__in=[ImageGenerationStatus.PENDING,
+                                                         ImageGenerationStatus.WAITING,
+                                                         ImageGenerationStatus.IN_PROGRESS])
 
     @classmethod
     def random(cls, style, references=None):

@@ -161,10 +161,9 @@ app.frame('/frog/mint', (f) => {
 
 app.frame("/frog/:id", async (c) => {
   const id = c.req.param('id')
-  const frog = await loadFrogForVisitor(id, c.var.interactor?.fid)
-  const actionsAvailable = true;
+  const {frog, visitor} = await loadFrogForVisitor(id, c.var.interactor?.fid)
   const refreshButton = <Button value="refresh" action={`/frog/${frog?.id}`}>Refresh</Button>
-  const intents = frog && actionsAvailable ? [
+  const intents = frog && visitor?.actionsAllowed ? [
       <Button value="feed" action={`/frog/${frog.id}/interact`}>🥗 Feed</Button>,
       <Button value="play" action={`/frog/${frog.id}/interact`}>🎮 Play</Button>,
       <Button value="compliment" action={`/frog/${frog.id}/interact`}>👍 Compliment</Button>,
@@ -172,10 +171,19 @@ app.frame("/frog/:id", async (c) => {
   ] : [
     refreshButton
   ]
+
   return c.res({
     image: (
-      <FrogProfileFrame frog={frog}>
-        Yisss
+      <FrogProfileFrame frog={frog || undefined}>
+        {visitor?.cooldownUntil ? (
+          <div style={{display: "flex", color: "white", fontSize: 30}}>
+            You can interact again in {Math.ceil(visitor.cooldownUntil / 60)} minutes.
+          </div>
+        ) : visitor?.actionsAllowed ? (
+          <div style={{display: "flex", color: "white", fontSize: 30}}>
+            Help take care of {frog?.owner.firstName}'s frog!
+          </div>
+        ): null}
       </FrogProfileFrame>
     ),
     intents
@@ -184,7 +192,7 @@ app.frame("/frog/:id", async (c) => {
 
 app.frame("/frog/:id/interact", async (c) => {
   const id = c.req.param('id')
-  const frog = await loadFrogForVisitor(id, c.var.interactor?.fid)
+  const {frog, visitor} = await loadFrogForVisitor(id, c.var.interactor?.fid)
   const {buttonValue} = c
   return c.res({
     image: (

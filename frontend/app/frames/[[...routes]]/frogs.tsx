@@ -44,7 +44,7 @@ export const MyFrogFrame: FrameHandler = async (c) => {
 
     const shareText = `I adopted a ${frog.species?.split(' - ')[0]} on WarpCast!`
     const embedURL = process.env.NEXT_PUBLIC_URL + "/frames/frog/" + frog.id
-    const shareURL = `https://warpcast.com/~/compose?text=${shareText + embedURL}&embeds%5B%5D=${embedURL}`
+    const shareURL = `https://warpcast.com/~/compose?text=${shareText}&embeds%5B%5D=${embedURL}`
     return c.res({
       image: (
         <FrogProfileFrame frog={frog}>
