@@ -125,9 +125,10 @@ ENV NODE_ENV production
 ENV NEXT_TELEMETRY_DISABLED 1
 RUN addgroup --system --gid 1001 nodejs
 RUN adduser --system --uid 1001 nextjs
+RUN mkdir /app
 
-COPY --from=frontend --chown=nextjs:nodejs /app/frontend/ /frontend
-WORKDIR /frontend
+COPY --from=frontend --chown=nextjs:nodejs /app/frontend/ /app/frontend
+WORKDIR /app/frontend
 
 EXPOSE 3000
 ENV PORT 3000
