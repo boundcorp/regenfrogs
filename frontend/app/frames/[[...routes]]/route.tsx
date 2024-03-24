@@ -51,7 +51,7 @@ const app = new Frog({
   // because frog is ignoring our origin config, idgi
 
   await next()
-  console.log(`Frame ${c.req.url} responded with ${c.res.status}`)
+  console.log(`[${c.res.status}] ${c.req.url.substring(0,100)}`)
   c.res = new Response(fixUrls(await c.res.text()), {
     headers: c.res.headers,
     status: c.res.status
