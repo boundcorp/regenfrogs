@@ -27,11 +27,11 @@ class CATEGORY_CHOICES(models.TextChoices):
 
 
 def number_to_status(number: int):
-    if number > 40 and number < 60:
-        return STATUS_CHOICES.CONTENT
     if number < 40:
         return STATUS_CHOICES.SAD
-    if number > 60:
+    elif 40 < number < 60:
+        return STATUS_CHOICES.CONTENT
+    elif number > 60:
         return STATUS_CHOICES.HAPPY
 
 
@@ -100,6 +100,8 @@ class FrogProfile(TimestampMixin, MediumIDMixin):
                 .order_by("?")
                 .first()
             )
+            if not image:
+                raise Exception("No available images to adopt from")
             if not image.image_chosen:
                 image.choose_number(1)
 
@@ -120,6 +122,8 @@ class FrogProfile(TimestampMixin, MediumIDMixin):
 
     @classmethod
     def game_loop(cls):
+        from django.conf import settings
+
         due_for_loop = cls.objects.filter(
             models.Q(last_loop__isnull=True)
             | models.Q(last_loop__lt=timezone.now() - timedelta(seconds=settings.FROG_LOOP_SECONDS)),
@@ -135,19 +139,19 @@ class FrogProfile(TimestampMixin, MediumIDMixin):
         print("  processing frog loop", self.id, self.age, self.health, self.sanity, self.hunger)
         self.last_loop = timezone.now()
         hungry = random.choice(HUNGER_BY_AGES[self.age])
-        self.hunger -= hungry
+        self.hunger = max(0, self.hunger - hungry)
         rate, kinds = DANGER_BY_AGES[self.age]
         danger = random.random() < rate
         if danger:
             kind = random.choice(kinds)
-            self.health -= 10 * rate
+            self.health = max(0, self.health - 10 * rate)
             self.logs.create(text=f"{kind} attacked!", category=CATEGORY_CHOICES.HEALTH)
 
         self.sanity_counter -= 1
         if self.sanity_counter <= 0:
             self.sanity_counter = random.choice(INSANITY_BY_AGES[self.age])
             insanity = (self.age == "old" and 2 or 1) * (1 + self.days_since_last_action())
-            self.sanity -= insanity
+            self.sanity = max(0, self.sanity - insanity)
             self.logs.create(text=f"lost {insanity} sanity", category=CATEGORY_CHOICES.SANITY)
 
         if self.health == 0 or self.sanity == 0 or self.hunger == 0:
@@ -214,6 +218,10 @@ class FrogProfile(TimestampMixin, MediumIDMixin):
     @property
     def nft_title(self):
         return f"{self.species}"
+
+    @property
+    def image_url(self):
+        return self.image.chosen_image.url
 
     def upload_to_ipfs(self):
         from regenfrogs.utils.services.ipfs import upload_to_ipfs

@@ -1,12 +1,18 @@
-query frog($id: String!) {
-    frog(id: $id) {
+query frogForVisitor($id: String!, $fid: Int!) {
+    frogForVisitor(id: $id, fid: $fid) {
         ...FrogProfile
 
     }
 }
 
-mutation adoptFrog($input: AdoptFrogInput!) {
-    adoptFrog(input: $input) {
+query frogByFid($fid: Int!) {
+    frogByFid(fid: $fid) {
+        ...FrogProfile
+    }
+}
+
+mutation adoptFrog($fid: Int!) {
+    adoptFrog(fid: $fid) {
         __typename
         ... on AdoptFrogSuccess {
             frog {

@@ -12,17 +12,11 @@ export type Scalars = {
   DateTime: any;
 };
 
-export type AdoptFrogInput = {
-  address: Scalars['String'];
-  id: Scalars['String'];
-};
-
 export type AdoptFrogResult = AdoptFrogSuccess | Error;
 
 export type AdoptFrogSuccess = {
   __typename?: 'AdoptFrogSuccess';
   frog?: Maybe<FrogProfile>;
-  to?: Maybe<Scalars['String']>;
 };
 
 
@@ -95,7 +89,7 @@ export type Mutation = {
 
 
 export type MutationAdoptFrogArgs = {
-  input?: Maybe<AdoptFrogInput>;
+  fid: Scalars['Int'];
 };
 
 
@@ -111,12 +105,19 @@ export type MutationMintedFrogArgs = {
 
 export type Query = {
   __typename?: 'Query';
-  frog?: Maybe<FrogProfile>;
+  frogByFid?: Maybe<FrogProfile>;
+  frogForVisitor?: Maybe<FrogProfile>;
   myProfile?: Maybe<UserProfile>;
 };
 
 
-export type QueryFrogArgs = {
+export type QueryFrogByFidArgs = {
+  fid: Scalars['Int'];
+};
+
+
+export type QueryFrogForVisitorArgs = {
+  fid: Scalars['Int'];
   id: Scalars['String'];
 };
 
@@ -135,18 +136,29 @@ export type UserProfileFragment = { __typename?: 'UserProfile', id: string, firs
 
 export type FrogProfileFragment = { __typename?: 'FrogProfile', id: string, status: FrogProfileStatus, health: number, sanity: number, hunger: number, alive: boolean, species?: Maybe<string>, imageUrl?: Maybe<string>, ipfsImageCid?: Maybe<string>, ipfsMetadataCid?: Maybe<string>, mintedNftId?: Maybe<number> };
 
-export type FrogQueryVariables = Exact<{
+export type FrogForVisitorQueryVariables = Exact<{
   id: Scalars['String'];
+  fid: Scalars['Int'];
 }>;
 
 
-export type FrogQuery = { __typename?: 'Query', frog?: Maybe<(
+export type FrogForVisitorQuery = { __typename?: 'Query', frogForVisitor?: Maybe<(
+    { __typename?: 'FrogProfile' }
+    & FrogProfileFragment
+  )> };
+
+export type FrogByFidQueryVariables = Exact<{
+  fid: Scalars['Int'];
+}>;
+
+
+export type FrogByFidQuery = { __typename?: 'Query', frogByFid?: Maybe<(
     { __typename?: 'FrogProfile' }
     & FrogProfileFragment
   )> };
 
 export type AdoptFrogMutationVariables = Exact<{
-  input: AdoptFrogInput;
+  fid: Scalars['Int'];
 }>;
 
 
@@ -192,55 +204,93 @@ export const UserProfileFragmentDoc = gql`
     `;
 export const FrogProfileFragmentDoc = gql`
     fragment FrogProfile on FrogProfile {
-  id
-  status
-  health
-  sanity
-  hunger
-  alive
-  species
-  imageUrl
-  ipfsImageCid
-  ipfsMetadataCid
-  mintedNftId
-}
-    `;
-export const FrogDocument = gql`
-    query frog($id: String!) {
-  frog(id: $id) {
+        owner {
+            id
+            username
+        }
+        id
+        status
+        health
+        sanity
+        hunger
+        alive
+        species
+        imageUrl
+        ipfsImageCid
+        ipfsMetadataCid
+        mintedNftId
+    }
+`;
+export const FrogForVisitorDocument = gql`
+    query frogForVisitor($id: String!, $fid: Int!) {
+  frogForVisitor(id: $id, fid: $fid) {
     ...FrogProfile
   }
 }
     ${FrogProfileFragmentDoc}`;
 
 /**
- * __useFrogQuery__
+ * __useFrogForVisitorQuery__
  *
- * To run a query within a React component, call `useFrogQuery` and pass it any options that fit your needs.
- * When your component renders, `useFrogQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * To run a query within a React component, call `useFrogForVisitorQuery` and pass it any options that fit your needs.
+ * When your component renders, `useFrogForVisitorQuery` returns an object from Apollo Client that contains loading, error, and data properties
  * you can use to render your UI.
  *
  * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
  *
  * @example
- * const { data, loading, error } = useFrogQuery({
+ * const { data, loading, error } = useFrogForVisitorQuery({
  *   variables: {
  *      id: // value for 'id'
+ *      fid: // value for 'fid'
  *   },
  * });
  */
-export function useFrogQuery(baseOptions?: Apollo.QueryHookOptions<FrogQuery, FrogQueryVariables>) {
-        return Apollo.useQuery<FrogQuery, FrogQueryVariables>(FrogDocument, baseOptions);
+export function useFrogForVisitorQuery(baseOptions?: Apollo.QueryHookOptions<FrogForVisitorQuery, FrogForVisitorQueryVariables>) {
+        return Apollo.useQuery<FrogForVisitorQuery, FrogForVisitorQueryVariables>(FrogForVisitorDocument, baseOptions);
       }
-export function useFrogLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<FrogQuery, FrogQueryVariables>) {
-          return Apollo.useLazyQuery<FrogQuery, FrogQueryVariables>(FrogDocument, baseOptions);
+export function useFrogForVisitorLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<FrogForVisitorQuery, FrogForVisitorQueryVariables>) {
+          return Apollo.useLazyQuery<FrogForVisitorQuery, FrogForVisitorQueryVariables>(FrogForVisitorDocument, baseOptions);
         }
-export type FrogQueryHookResult = ReturnType<typeof useFrogQuery>;
-export type FrogLazyQueryHookResult = ReturnType<typeof useFrogLazyQuery>;
-export type FrogQueryResult = Apollo.QueryResult<FrogQuery, FrogQueryVariables>;
+export type FrogForVisitorQueryHookResult = ReturnType<typeof useFrogForVisitorQuery>;
+export type FrogForVisitorLazyQueryHookResult = ReturnType<typeof useFrogForVisitorLazyQuery>;
+export type FrogForVisitorQueryResult = Apollo.QueryResult<FrogForVisitorQuery, FrogForVisitorQueryVariables>;
+export const FrogByFidDocument = gql`
+    query frogByFid($fid: Int!) {
+  frogByFid(fid: $fid) {
+    ...FrogProfile
+  }
+}
+    ${FrogProfileFragmentDoc}`;
+
+/**
+ * __useFrogByFidQuery__
+ *
+ * To run a query within a React component, call `useFrogByFidQuery` and pass it any options that fit your needs.
+ * When your component renders, `useFrogByFidQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useFrogByFidQuery({
+ *   variables: {
+ *      fid: // value for 'fid'
+ *   },
+ * });
+ */
+export function useFrogByFidQuery(baseOptions?: Apollo.QueryHookOptions<FrogByFidQuery, FrogByFidQueryVariables>) {
+        return Apollo.useQuery<FrogByFidQuery, FrogByFidQueryVariables>(FrogByFidDocument, baseOptions);
+      }
+export function useFrogByFidLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<FrogByFidQuery, FrogByFidQueryVariables>) {
+          return Apollo.useLazyQuery<FrogByFidQuery, FrogByFidQueryVariables>(FrogByFidDocument, baseOptions);
+        }
+export type FrogByFidQueryHookResult = ReturnType<typeof useFrogByFidQuery>;
+export type FrogByFidLazyQueryHookResult = ReturnType<typeof useFrogByFidLazyQuery>;
+export type FrogByFidQueryResult = Apollo.QueryResult<FrogByFidQuery, FrogByFidQueryVariables>;
 export const AdoptFrogDocument = gql`
-    mutation adoptFrog($input: AdoptFrogInput!) {
-  adoptFrog(input: $input) {
+    mutation adoptFrog($fid: Int!) {
+  adoptFrog(fid: $fid) {
     __typename
     ... on AdoptFrogSuccess {
       frog {
@@ -268,7 +318,7 @@ export type AdoptFrogMutationFn = Apollo.MutationFunction<AdoptFrogMutation, Ado
  * @example
  * const [adoptFrogMutation, { data, loading, error }] = useAdoptFrogMutation({
  *   variables: {
- *      input: // value for 'input'
+ *      fid: // value for 'fid'
  *   },
  * });
  */

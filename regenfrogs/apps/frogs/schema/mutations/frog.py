@@ -1,33 +1,27 @@
 import graphene
 
 from regenfrogs.apps.frogs.models import FrogProfile
+from regenfrogs.apps.users.models import User
 from regenfrogs.utils.graphql import Error, success_or_error
 from regenfrogs.utils.graphql.validator.decorators import validated
 
 from .. import types
 
 
-class AdoptFrogInput(graphene.InputObjectType):
-    id = graphene.String(required=True)
-    address = graphene.String(required=True)
-
-
 class AdoptFrogSuccess(graphene.ObjectType):
     frog = graphene.Field(types.FrogProfile)
-    to = graphene.String()
 
 
-@validated
 class AdoptFrog(graphene.Mutation):
     class Arguments:
-        input = AdoptFrogInput()
+        fid = graphene.Int(required=True)
 
     Output = success_or_error(AdoptFrogSuccess)
 
-    def mutate(self, info, input):
+    def mutate(self, info, fid):
         try:
-            frog = FrogProfile.objects.get(pk=input.id)
-
+            user = User.objects.get(farcaster_id=fid)
+            frog = FrogProfile.adopt_from_image(user)
             return AdoptFrogSuccess(
                 frog=frog,
             )

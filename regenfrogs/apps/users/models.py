@@ -3,6 +3,7 @@ import json
 from django.contrib.auth.models import AbstractUser
 from django.db import models
 
+from regenfrogs.apps.frogs.models import FrogProfile
 from regenfrogs.utils.email import MailMixin
 from regenfrogs.utils.models import MediumIDMixin, TimestampMixin, UUIDMixin
 from regenfrogs.utils.services.neynar import Author, Cast, FrameInteraction
@@ -18,6 +19,12 @@ class User(TimestampMixin, MediumIDMixin, AbstractUser, MailMixin):
     farcaster_id = models.PositiveIntegerField(default=0)
     follower_count = models.PositiveIntegerField(default=0)
     following_count = models.PositiveIntegerField(default=0)
+
+    def get_current_living_frog(self):
+        return self.frogprofile_set.filter(alive=True).first()
+
+    def get_or_create_frog(self):
+        return self.get_current_living_frog() or FrogProfile.adopt_from_image(self)
 
     def __str__(self):
         return f"{self.get_full_name()} <{self.email}>"
