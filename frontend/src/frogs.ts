@@ -40,8 +40,7 @@ export async function loadFrogForVisitor(id: string, fid: number | undefined): P
                                 user {
                                     id
                                 }
-                                cooldownUntil
-                                actionsAllowed
+                                ${FROG_VISITOR_FIELDS}
                             }
                             frog {
                                 ... on FrogProfile {

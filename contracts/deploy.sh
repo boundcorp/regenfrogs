@@ -6,11 +6,11 @@ source ../.secrets.env
 # https://rainforestfoundation.org/give/cryptocurrency/
 CHARITY="0x338326660F32319E2B0Ad165fcF4a528c1994aCb"
 
-if [[ "${2-sepolia}" == "base-mainnet" ]]; then
+if [[ "${1-sepolia}" == "base-mainnet" ]]; then
   RPC_URL=$BASE_MAINNET_RPC
   BLOCKSCAN_KEY=$BASESCAN_API_KEY
-  GAS_PRICE=500
-elif [[ "${2-sepolia}" == "base-goerli" ]]; then
+  GAS_PRICE=150000000
+elif [[ "${1-sepolia}" == "base-goerli" ]]; then
   RPC_URL=$BASE_GOERLI_RPC
   BLOCKSCAN_KEY=$BASESCAN_API_KEY
   GAS_PRICE=200000000
