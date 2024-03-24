@@ -12,16 +12,16 @@ import Toolbar from '@mui/material/Toolbar';
 import IconButton from '@mui/material/IconButton';
 import Tooltip from '@mui/material/Tooltip';
 import Image from 'next/image'
-import {getFrameMetadata} from "frog";
-import {Metadata} from "next";
-import {fixUrls} from "@/src/urls";
+import { getFrameMetadata } from "frog";
+import { Metadata } from "next";
+import { fixUrls } from "@/src/urls";
 
 
 export async function generateMetadata(): Promise<Metadata> {
   const url = process.env.NEXT_PUBLIC_URL
   console.log("Loading frame metadata", url)
   const data = url ? await getFrameMetadata(`${url}/frames/intro`) : []
-  return {other: data.reduce((acc, {property, content}) => ({...acc, [property]: fixUrls(content)}), {})}
+  return { other: data.reduce((acc, { property, content }) => ({ ...acc, [property]: fixUrls(content) }), {}) }
 }
 
 const myFont = localFont({ src: './fonts/Catboo.ttf' })
@@ -50,7 +50,7 @@ export default function Home() {
             </Box>
             <Tooltip title="Farcaster"><Link href="https://warpcast.com" target={"_blank"}><IconButton color="inherit"><Image src="/farcaster.png" width={30} height={30} alt="Farcaster Logo" /></IconButton></Link></Tooltip>
             <Tooltip title="BaseScan"><Link href="https://basescan.org" target={"_blank"}><IconButton color="inherit"><Image src="/basescan.png" width={30} height={30} alt="Basescan Logo" /></IconButton></Link></Tooltip>
-            <Tooltip title="OpenSea"><Link href="https://opensea.com" target={"_blank"}><IconButton color="inherit"><Image src="/opensea.png" width={30} height={30} alt="OpenSea Logo" /></IconButton></Link></Tooltip>
+            <Tooltip title="OpenSea"><Link href="https://opensea.io" target={"_blank"}><IconButton color="inherit"><Image src="/opensea.png" width={30} height={30} alt="OpenSea Logo" /></IconButton></Link></Tooltip>
           </Toolbar>
         </AppBar>
       </Box>
@@ -64,7 +64,7 @@ export default function Home() {
         <Grid container alignItems={"stretch"} spacing={3} mb={"2em"}>
 
           <Grid item xs={12} md={6} lg={4}>
-            <Card sx={{ padding: '3em', borderRadius: '15px' }}>
+            <Card sx={{ padding: '2em', borderRadius: '15px' }}>
               <CardMedia component={"img"} image="/images/regenfrogs-frog1.jpg" title="Frog" sx={{ height: 140, objectFit: "contain" }} />
               <CardContent>
                 <h1 className={roboto.className} style={{ fontWeight: 'bold', fontSize: '30px' }}>1. Adopt Your Frog</h1>
@@ -76,15 +76,18 @@ export default function Home() {
           </Grid>
 
           <Grid item xs={12} md={6} lg={4}>
-            <Card sx={{ padding: '3em', borderRadius: '15px' }}>
-              <h1 className={roboto.className} style={{ fontWeight: 'bold', fontSize: '30px' }}>2. Care for Your Frog</h1>
-              <div className={roboto.className} style={{ fontSize: '25px', marginBottom: "1em", marginTop: "0.5em" }}>
-                Post your frog frame on Farcaster so your friends can help you feed, nurture, and play with your frog to keep them happy and healthy.
-              </div>
+            <Card sx={{ padding: '2em', borderRadius: '15px' }}>
+              <CardMedia component={"img"} image="/images/adopted-frame.png" title="Adopted Frame" sx={{ height: 140, objectFit: "contain" }} />
+              <CardContent>
+                <h1 className={roboto.className} style={{ fontWeight: 'bold', fontSize: '30px' }}>2. Care for Your Frog</h1>
+                <div className={roboto.className} style={{ fontSize: '25px', marginBottom: "1em", marginTop: "0.5em" }}>
+                  Post your frog frame on Farcaster so your friends can help you feed, nurture, and play with your frog to keep them happy and healthy.
+                </div>
+              </CardContent>
             </Card>
           </Grid>
           <Grid item xs={12} lg={4}>
-            <Card sx={{ padding: '3em', borderRadius: '15px' }}>
+            <Card sx={{ padding: '2em', borderRadius: '15px' }}>
               <h1 className={roboto.className} style={{ fontWeight: 'bold', fontSize: '30px' }}>3. Mint NFTs</h1>
               <div className={roboto.className} style={{ fontSize: '25px', marginBottom: "1em", marginTop: "0.5em" }}>
                 All frogs go to heaven. Upon your frog&apos;s digital demise, mint commemorative NFTs to immortalize the frog's glorious memory.
