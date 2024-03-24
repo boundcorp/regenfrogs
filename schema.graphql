@@ -15,6 +15,11 @@ type Error {
   message: String!
 }
 
+type FrogForVisitor {
+  frog: FrogProfile
+  visitor: VisitorResponse
+}
+
 type FrogProfile {
   id: String!
   createdAt: DateTime!
@@ -74,7 +79,7 @@ type Mutation {
 }
 
 type Query {
-  frogForVisitor(id: String!, fid: Int): FrogProfile
+  frogForVisitor(id: String!, fid: Int): FrogForVisitor
   frogByFid(fid: Int!): FrogProfile
   myProfile: UserProfile
 }
@@ -87,4 +92,10 @@ type UserProfile {
   isStaff: Boolean!
   id: String!
   farcasterId: Int!
+}
+
+type VisitorResponse {
+  user: UserProfile
+  actionsAllowed: Boolean!
+  cooldownUntil: Int
 }

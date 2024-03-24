@@ -29,13 +29,8 @@ const AdoptFrame: FrameHandler = async (c)  => {
             `,
           variables: {fid: c.var.interactor?.fid}
         })
-      console.log("Adopted", JSON.stringify(adopted?.data?.frog))
-      return c.res({
-        image: (<div>Adopted frog</div>),
-        intents: [
-          <Button value="frog" action="/frog/1">My Frog</Button>,
-        ]
-      })
+      console.log("Adopted", JSON.stringify(adopted?.data))
+      return MyFrogFrame(c)
     } else {
       console.log("How it works")
       return c.res({

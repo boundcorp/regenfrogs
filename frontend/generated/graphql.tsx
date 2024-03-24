@@ -25,6 +25,12 @@ export type Error = {
   message: Scalars['String'];
 };
 
+export type FrogForVisitor = {
+  __typename?: 'FrogForVisitor';
+  frog?: Maybe<FrogProfile>;
+  visitor?: Maybe<VisitorResponse>;
+};
+
 export type FrogProfile = {
   __typename?: 'FrogProfile';
   alive: Scalars['Boolean'];
@@ -106,7 +112,7 @@ export type MutationMintedFrogArgs = {
 export type Query = {
   __typename?: 'Query';
   frogByFid?: Maybe<FrogProfile>;
-  frogForVisitor?: Maybe<FrogProfile>;
+  frogForVisitor?: Maybe<FrogForVisitor>;
   myProfile?: Maybe<UserProfile>;
 };
 
@@ -132,9 +138,21 @@ export type UserProfile = {
   username: Scalars['String'];
 };
 
+export type VisitorResponse = {
+  __typename?: 'VisitorResponse';
+  actionsAllowed: Scalars['Boolean'];
+  cooldownUntil?: Maybe<Scalars['Int']>;
+  user?: Maybe<UserProfile>;
+};
+
 export type UserProfileFragment = { __typename?: 'UserProfile', id: string, firstName: string, lastName: string, email: string, username: string };
 
 export type FrogProfileFragment = { __typename?: 'FrogProfile', id: string, status: FrogProfileStatus, health: number, sanity: number, hunger: number, alive: boolean, species?: Maybe<string>, imageUrl?: Maybe<string>, ipfsImageCid?: Maybe<string>, ipfsMetadataCid?: Maybe<string>, mintedNftId?: Maybe<number> };
+
+export type VisitorResponseFragment = { __typename?: 'VisitorResponse', actionsAllowed: boolean, cooldownUntil?: Maybe<number>, user?: Maybe<(
+    { __typename?: 'UserProfile' }
+    & UserProfileFragment
+  )> };
 
 export type FrogForVisitorQueryVariables = Exact<{
   id: Scalars['String'];
@@ -142,10 +160,13 @@ export type FrogForVisitorQueryVariables = Exact<{
 }>;
 
 
-export type FrogForVisitorQuery = { __typename?: 'Query', frogForVisitor?: Maybe<(
-    { __typename?: 'FrogProfile' }
-    & FrogProfileFragment
-  )> };
+export type FrogForVisitorQuery = { __typename?: 'Query', frogForVisitor?: Maybe<{ __typename?: 'FrogForVisitor', frog?: Maybe<(
+      { __typename?: 'FrogProfile' }
+      & FrogProfileFragment
+    )>, visitor?: Maybe<(
+      { __typename?: 'VisitorResponse' }
+      & VisitorResponseFragment
+    )> }> };
 
 export type FrogByFidQueryVariables = Exact<{
   fid: Scalars['Int'];
@@ -193,15 +214,6 @@ export type MyProfileQuery = { __typename?: 'Query', myProfile?: Maybe<(
     & UserProfileFragment
   )> };
 
-export const UserProfileFragmentDoc = gql`
-    fragment UserProfile on UserProfile {
-  id
-  firstName
-  lastName
-  email
-  username
-}
-    `;
 export const FrogProfileFragmentDoc = gql`
     fragment FrogProfile on FrogProfile {
   id
@@ -217,13 +229,37 @@ export const FrogProfileFragmentDoc = gql`
   mintedNftId
 }
     `;
+export const UserProfileFragmentDoc = gql`
+    fragment UserProfile on UserProfile {
+  id
+  firstName
+  lastName
+  email
+  username
+}
+    `;
+export const VisitorResponseFragmentDoc = gql`
+    fragment VisitorResponse on VisitorResponse {
+  actionsAllowed
+  cooldownUntil
+  user {
+    ...UserProfile
+  }
+}
+    ${UserProfileFragmentDoc}`;
 export const FrogForVisitorDocument = gql`
     query frogForVisitor($id: String!, $fid: Int!) {
   frogForVisitor(id: $id, fid: $fid) {
-    ...FrogProfile
+    frog {
+      ...FrogProfile
+    }
+    visitor {
+      ...VisitorResponse
+    }
   }
 }
-    ${FrogProfileFragmentDoc}`;
+    ${FrogProfileFragmentDoc}
+${VisitorResponseFragmentDoc}`;
 
 /**
  * __useFrogForVisitorQuery__

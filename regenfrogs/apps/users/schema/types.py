@@ -14,5 +14,4 @@ class UserProfile(DjangoObjectType):
             "first_name",
             "last_name",
             "farcaster_id",
-            "frogs",
         ]

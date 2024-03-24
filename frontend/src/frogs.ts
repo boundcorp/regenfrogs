@@ -1,8 +1,9 @@
 import {backendApolloClient} from "@/src/apollo-client";
 import {gql} from "@apollo/client";
-import {FrogProfileFragment} from "@/generated/graphql";
+import {FrogForVisitor, FrogForVisitorQueryResult, FrogProfileFragment} from "@/generated/graphql";
 
 export const FROG_PROFILE_FIELDS = 'id species hands clothes alive imageUrl status health hunger sanity'
+export const FROG_VISITOR_FIELDS = 'allowedActions cooldown'
 
 export async function loadFrogForFid(fid: number | undefined): Promise<FrogProfileFragment | undefined> {
   const apollo = backendApolloClient({})
@@ -27,7 +28,7 @@ export async function loadFrogForFid(fid: number | undefined): Promise<FrogProfi
     }
 }
 
-export async function loadFrogForVisitor(id: string, fid: number | undefined): Promise<FrogProfileFragment | undefined> {
+export async function loadFrogForVisitor(id: string, fid: number | undefined): Promise<FrogForVisitor> {
   const apollo = backendApolloClient({})
     if (id) {
         try {
@@ -35,8 +36,17 @@ export async function loadFrogForVisitor(id: string, fid: number | undefined): P
                 query: gql`
                     query frogByFid($id: String!, $fid: Int) {
                         frogForVisitor(id: $id, fid: $fid) {
-                            ... on FrogProfile {
-                                ${FROG_PROFILE_FIELDS}
+                            visitor {
+                                user {
+                                    id
+                                }
+                                cooldownUntil
+                                actionsAllowed
+                            }
+                            frog {
+                                ... on FrogProfile {
+                                    ${FROG_PROFILE_FIELDS}
+                                }
                             }
                         }
                     }
@@ -48,4 +58,5 @@ export async function loadFrogForVisitor(id: string, fid: number | undefined): P
           console.error("Error fetching frog status", e)
         }
     }
+    return {frog: undefined, visitor: undefined}
 }

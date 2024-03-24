@@ -38,7 +38,7 @@ spec:
           command:
             - bash
             - -c
-            - cd .next/standalone && echo NEYNAR_API_KEY=$NEYNAR_API_KEY > .env.production && node server.js
+            - echo NEYNAR_API_KEY=$NEYNAR_API_KEY > .env.production && yarn start
           env:
             - name: "SENTRY_RELEASE"
               value: {{ $.Values.image.tag }}
