@@ -9,7 +9,7 @@ from django.db import models
 from django.utils import timezone
 from django_q.models import Schedule
 
-from regenfrogs.utils.ai_models import ImageGenerationStatus, ImagePromptMixin
+from regenfrogs.utils.ai_models import ImageGenerationStatus, ImagePromptMixin, ipfs_to_proxy_url, upload_to_ipfs
 from regenfrogs.utils.models import MediumIDMixin, TimestampMixin, UUIDMixin
 
 from . import profiles
@@ -86,8 +86,7 @@ class FrogProfile(TimestampMixin, MediumIDMixin):
     hands = models.TextField(null=True, blank=True)
     clothes = models.TextField(null=True, blank=True)
 
-    ipfs_image_cid = models.TextField(null=True, blank=True)
-    ipfs_metadata_cid = models.TextField(null=True, blank=True)
+    ipfs_metadata_hash = models.TextField(null=True, blank=True)
     minted_nft_id = models.PositiveIntegerField(null=True, blank=True)
     minted_nft_address = models.TextField(null=True, blank=True)
     minted_nft_tx_hash = models.TextField(null=True, blank=True)
@@ -218,6 +217,33 @@ class FrogProfile(TimestampMixin, MediumIDMixin):
             return 10
         return (timezone.now() - last_action.created_at).days
 
+    def days_since_death(self):
+        if not self.died_at:
+            return 0
+        return (timezone.now() - self.died_at).days
+
+    def mint_for(self, visitor):
+        if self.alive or self.days_since_death() > 7 or not visitor:
+            return
+        return self.get_mint_parameters(visitor)
+
+    def get_mint_parameters(self, user):
+        from .schema.types import MintParameters
+        from regenfrogs.utils.services.blockchain import CurrentNetwork
+        EXPIRY = 900
+        MICROETH_PRICE = 1000
+        if not self.ipfs_metadata_hash:
+            name = f"RegenFrogs/{self.ipfs_metadata_filename}"
+            self.ipfs_metadata_hash, _ = upload_to_ipfs(name, StringIO(json.dumps(self.nft_metadata())))
+            self.save()
+        return MintParameters(
+            to=user.verified_address,
+            nonce=CurrentNetwork.next_nonce(),
+            uri=self.ipfs_metadata_url,
+            price_wei=MICROETH_PRICE * 10 ** 18 // 1_000_000,
+            expires=int(timezone.now().timestamp() + EXPIRY),
+        )
+
     def nft_attributes(self):
         return [
             {"trait_type": "Species", "value": self.species},
@@ -228,7 +254,7 @@ class FrogProfile(TimestampMixin, MediumIDMixin):
     def nft_metadata(self):
         return {
             "name": self.nft_title,
-            "image": self.ipfs_image_url,
+            "image": self.image.ipfs_url,
             "background_color": "#55a630",
             "attributes": self.nft_attributes(),
         }
@@ -236,6 +262,22 @@ class FrogProfile(TimestampMixin, MediumIDMixin):
     @property
     def nft_title(self):
         return f"{self.species}"
+
+    @property
+    def ipfs_metadata_url(self):
+        return f"ipfs://{self.ipfs_metadata_path}"
+
+    @property
+    def ipfs_proxy_metadata_url(self):
+        return ipfs_to_proxy_url(self.ipfs_metadata_path)
+
+    @property
+    def ipfs_metadata_filename(self):
+        return f"{self.image.id}.json"
+
+    @property
+    def ipfs_metadata_path(self):
+        return f"{self.ipfs_metadata_hash}/{self.ipfs_metadata_filename}"
 
     @property
     def image_url(self):

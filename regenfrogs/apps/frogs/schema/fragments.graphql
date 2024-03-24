@@ -15,7 +15,4 @@ fragment FrogProfile on FrogProfile {
     alive
     species
     imageUrl
-    ipfsImageCid
-    ipfsMetadataCid
-    mintedNftId
 }

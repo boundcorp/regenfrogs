@@ -19,6 +19,10 @@ class User(TimestampMixin, MediumIDMixin, AbstractUser, MailMixin):
     farcaster_id = models.PositiveIntegerField(default=0)
     follower_count = models.PositiveIntegerField(default=0)
     following_count = models.PositiveIntegerField(default=0)
+    verified_address = models.CharField(max_length=64, null=True, blank=True)
+
+    def get_latest_frog(self):
+        return self.frogprofile_set.order_by("-created_at").first()
 
     def get_current_living_frog(self):
         return self.frogprofile_set.filter(alive=True).first()
@@ -35,12 +39,15 @@ class User(TimestampMixin, MediumIDMixin, AbstractUser, MailMixin):
         loaded["interactor"] = loaded.get("interactor") or {}
         loaded["interactor"].pop("viewerContext", "")
         interaction = FrameInteraction(
-            interactor=Author(**loaded.get("interactor")),
-            cast=loaded.get("cast") and Cast(**loaded["cast"]),
+            interactor=Author(**{k: v for k, v in loaded.get("interactor", {}).items() if k in
+            ["fid", "username", "displayName", "followerCount", "followingCount", "verifiedAddresses"]}),
+            cast=loaded.get("cast") and Cast(**{k: v for k, v in loaded.get("cast", {}).items() if
+                                              k in ["hash", "timestamp"]}),
         )
         if not interaction or not interaction.interactor or not interaction.interactor.fid:
             user = None
         else:
+            eth_addrs = interaction.interactor.verifiedAddresses and interaction.interactor.verifiedAddresses['ethAddresses'] or []
             user = cls.objects.update_or_create(
                 farcaster_id=interaction.interactor.fid,
                 defaults={
@@ -49,6 +56,7 @@ class User(TimestampMixin, MediumIDMixin, AbstractUser, MailMixin):
                     "first_name": interaction.interactor.displayName,
                     "follower_count": interaction.interactor.followerCount,
                     "following_count": interaction.interactor.followingCount,
+                    "verified_address": eth_addrs and eth_addrs[-1]
                 },
             )[0]
         view = FrameView.objects.create(

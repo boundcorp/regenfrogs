@@ -46,13 +46,13 @@ class Network(object):
             return 1
 
     def test_mint(self, nonce=None, expires=None):
-        from regenfrogs.apps.frogs.models import Frog
+        from regenfrogs.apps.frogs.models import FrogProfile
 
         print("RPC:", self.rpc)
         w3 = self.client
 
         to = os.environ.get("ETH_WALLET_ADDR", "")
-        frog = Frog.objects.filter(image__ipfs_hash__isnull=False).first()
+        frog = FrogProfile.objects.filter(image__ipfs_hash__isnull=False).first()
         if frog:
             uri = frog.image.ipfs_url
         else:

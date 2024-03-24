@@ -42,8 +42,7 @@ export type FrogProfile = {
   hunger: Scalars['Int'];
   id: Scalars['String'];
   imageUrl?: Maybe<Scalars['String']>;
-  ipfsImageCid?: Maybe<Scalars['String']>;
-  ipfsMetadataCid?: Maybe<Scalars['String']>;
+  ipfsMetadataHash?: Maybe<Scalars['String']>;
   lastLoop?: Maybe<Scalars['DateTime']>;
   mintedNftAddress?: Maybe<Scalars['String']>;
   mintedNftId?: Maybe<Scalars['Int']>;
@@ -69,6 +68,15 @@ export type InteractionResult = Error | InteractionSuccess;
 export type InteractionSuccess = {
   __typename?: 'InteractionSuccess';
   success?: Maybe<Scalars['Boolean']>;
+};
+
+export type MintParameters = {
+  __typename?: 'MintParameters';
+  expires?: Maybe<Scalars['Int']>;
+  nonce?: Maybe<Scalars['Int']>;
+  priceWei?: Maybe<Scalars['String']>;
+  to?: Maybe<Scalars['String']>;
+  uri?: Maybe<Scalars['String']>;
 };
 
 export type MintedFrogInput = {
@@ -142,12 +150,13 @@ export type VisitorResponse = {
   __typename?: 'VisitorResponse';
   actionsAllowed: Scalars['Boolean'];
   cooldownUntil?: Maybe<Scalars['Int']>;
+  mintParameters?: Maybe<MintParameters>;
   user?: Maybe<UserProfile>;
 };
 
 export type UserProfileFragment = { __typename?: 'UserProfile', id: string, firstName: string, lastName: string, email: string, username: string };
 
-export type FrogProfileFragment = { __typename?: 'FrogProfile', id: string, status: FrogProfileStatus, health: number, sanity: number, hunger: number, alive: boolean, species?: Maybe<string>, imageUrl?: Maybe<string>, ipfsImageCid?: Maybe<string>, ipfsMetadataCid?: Maybe<string>, mintedNftId?: Maybe<number> };
+export type FrogProfileFragment = { __typename?: 'FrogProfile', id: string, status: FrogProfileStatus, health: number, sanity: number, hunger: number, alive: boolean, species?: Maybe<string>, imageUrl?: Maybe<string> };
 
 export type VisitorResponseFragment = { __typename?: 'VisitorResponse', actionsAllowed: boolean, cooldownUntil?: Maybe<number>, user?: Maybe<(
     { __typename?: 'UserProfile' }
@@ -224,9 +233,6 @@ export const FrogProfileFragmentDoc = gql`
   alive
   species
   imageUrl
-  ipfsImageCid
-  ipfsMetadataCid
-  mintedNftId
 }
     `;
 export const UserProfileFragmentDoc = gql`

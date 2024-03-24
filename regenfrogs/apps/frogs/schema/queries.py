@@ -11,6 +11,7 @@ class VisitorResponse(graphene.ObjectType):
     user = graphene.Field(UserProfile)
     actions_allowed = graphene.Boolean(required=True)
     cooldown_until = graphene.Int()
+    mint_parameters = graphene.Field(types.MintParameters)
 
 
 class FrogForVisitor(graphene.ObjectType):
@@ -34,9 +35,10 @@ class Queries(object):
                 user=visitor,
                 actions_allowed=actions_allowed,
                 cooldown_until=cooldown_until and (cooldown_until - timezone.now()).total_seconds(),
+                mint_parameters=frog.mint_for(visitor)
             ),
         )
 
     @define_query(graphene.Field(types.FrogProfile, fid=graphene.Int(required=True)))
     def frog_by_fid(self, info, fid):
-        return User.objects.get(farcaster_id=fid).get_current_living_frog()
+        return User.objects.get(farcaster_id=fid).get_latest_frog()

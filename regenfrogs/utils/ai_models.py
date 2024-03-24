@@ -22,6 +22,31 @@ def to_reference_url(url_or_image_prompt):
     if getattr(url_or_image_prompt, "ipfs_proxy_url", None):
         return url_or_image_prompt.ipfs_proxy_url
 
+def ipfs_to_proxy_url(ipfs_url):
+    return f"https://ipfs.io/ipfs/{ipfs_url.split('ipfs://')[1]}"
+
+def upload_to_ipfs(name, file):
+    import json
+
+    import requests
+    files = {
+        "file": (name, file),
+    }
+
+    pinata_jwt = os.environ.get("PINATA_KEY")
+    pinata_url = "https://api.pinata.cloud/pinning/pinFileToIPFS"
+    headers = {
+        "Authorization": f"Bearer {pinata_jwt}",
+    }
+    data = {
+        "pinataMetadata": json.dumps({"name": name}),
+        "pinataOptions": json.dumps({"cidVersion": 0}),
+    }
+
+    response = requests.post(pinata_url, headers=headers, data=data, files=files)
+    output = response.json()
+    return output["IpfsHash"], output
+
 
 class ImagePromptMixin(TimestampMixin):
     MAX_CONCURRENCY = 4
@@ -70,7 +95,7 @@ class ImagePromptMixin(TimestampMixin):
 
     @property
     def ipfs_proxy_url(self):
-        return f"https://ipfs.io/ipfs/{self.ipfs_path}"
+        return ipfs_to_proxy_url(self.ipfs_url)
 
     @property
     def ipfs_url(self):
@@ -80,29 +105,9 @@ class ImagePromptMixin(TimestampMixin):
         if self.ipfs_hash:
             return self
 
-        import json
-
-        import requests
-
         name = f"{self.IPFS_PREFIX}/{self.ipfs_filename}"
-
-        files = {
-            "file": (name, self.chosen_image),
-        }
-
-        pinata_jwt = os.environ.get("PINATA_KEY")
-        pinata_url = "https://api.pinata.cloud/pinning/pinFileToIPFS"
-        headers = {
-            "Authorization": f"Bearer {pinata_jwt}",
-        }
-        data = {
-            "pinataMetadata": json.dumps({"name": name}),
-            "pinataOptions": json.dumps({"cidVersion": 0}),
-        }
-
-        response = requests.post(pinata_url, headers=headers, data=data, files=files)
-        print(response.json())
-        self.ipfs_hash = response.json()["IpfsHash"]
+        self.ipfs_hash, rest = upload_to_ipfs(name, self.chosen_image)
+        print("Uploaded image", rest)
         self.save()
         return self
 

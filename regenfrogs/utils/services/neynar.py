@@ -24,17 +24,11 @@ class ViewerContext:
 
 @dataclass
 class Author:
-    object: str
     fid: Optional[int]
-    custodyAddress: str
     username: str
     displayName: str
-    pfpUrl: str
-    profile: Profile
     followerCount: int
     followingCount: int
-    activeStatus: str
-    verifications: List = field(default_factory=list)
     verifiedAddresses: Dict[str, List] = field(default_factory=dict)
 
 

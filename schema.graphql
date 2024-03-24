@@ -37,8 +37,7 @@ type FrogProfile {
   species: String
   hands: String
   clothes: String
-  ipfsImageCid: String
-  ipfsMetadataCid: String
+  ipfsMetadataHash: String
   mintedNftId: Int
   mintedNftAddress: String
   mintedNftTxHash: String
@@ -56,6 +55,14 @@ union InteractionResult = InteractionSuccess | Error
 
 type InteractionSuccess {
   success: Boolean
+}
+
+type MintParameters {
+  to: String
+  nonce: Int
+  uri: String
+  priceWei: String
+  expires: Int
 }
 
 input MintedFrogInput {
@@ -98,4 +105,5 @@ type VisitorResponse {
   user: UserProfile
   actionsAllowed: Boolean!
   cooldownUntil: Int
+  mintParameters: MintParameters
 }

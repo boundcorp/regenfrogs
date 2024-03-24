@@ -4,6 +4,14 @@ from graphene_django import DjangoObjectType
 from regenfrogs.apps.frogs import models
 
 
+class MintParameters(graphene.ObjectType):
+    to = graphene.String()
+    nonce = graphene.Int()
+    uri = graphene.String()
+    price_wei = graphene.String()
+    expires = graphene.Int()
+
+
 class FrogProfile(DjangoObjectType):
     image_url = graphene.String()
 
