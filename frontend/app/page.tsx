@@ -16,12 +16,6 @@ import {Metadata} from "next";
 
 
 export async function generateMetadata(): Promise<Metadata> {
-<<<<<<< HEAD
-  const url = process.env.NEXT_PUBLIC_URL
-  if(!url) return {}
-=======
-
->>>>>>> 62226117768e6984375fb4b6aa3b86b549e7b810
   const data = {
     description: "Virtual pet frog",
     "fc:frame": "vNext",
