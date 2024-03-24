@@ -47,15 +47,15 @@ class User(TimestampMixin, MediumIDMixin, AbstractUser, MailMixin):
                 }
             ),
             cast=loaded.get("cast")
-                 and Cast(**{k: v for k, v in loaded.get("cast", {}).items() if k in ["hash", "timestamp", "text"]}),
+            and Cast(**{k: v for k, v in loaded.get("cast", {}).items() if k in ["hash", "timestamp", "text"]}),
         )
         if not interaction or not interaction.interactor or not interaction.interactor.fid:
             user = None
         else:
             eth_addrs = (
-                    interaction.interactor.verifiedAddresses
-                    and interaction.interactor.verifiedAddresses["ethAddresses"]
-                    or []
+                interaction.interactor.verifiedAddresses
+                and interaction.interactor.verifiedAddresses["ethAddresses"]
+                or []
             )
             if isinstance(eth_addrs, str):
                 eth_addrs = json.loads(eth_addrs)
