@@ -1,16 +1,16 @@
 /** @jsxImportSource frog/jsx */
 
-import {Button, Frog} from 'frog'
-import {devtools} from 'frog/dev'
-import {handle} from 'frog/next'
-import {serveStatic} from 'frog/serve-static'
-import {neynar} from "frog/middlewares";
-import {fixUrls} from "@/src/urls";
-import {backendApolloClient} from "@/src/apollo-client";
-import {gql} from "@apollo/client";
-import {loadFrogForVisitor} from "@/src/frogs";
+import { Button, Frog } from 'frog'
+import { devtools } from 'frog/dev'
+import { handle } from 'frog/next'
+import { serveStatic } from 'frog/serve-static'
+import { neynar } from "frog/middlewares";
+import { fixUrls } from "@/src/urls";
+import { backendApolloClient } from "@/src/apollo-client";
+import { gql } from "@apollo/client";
+import { loadFrogForVisitor } from "@/src/frogs";
 import AdoptFrame from "@/app/frames/[[...routes]]/adopt";
-import {MyFrogFrame, FrogProfileFrame} from "@/app/frames/[[...routes]]/frogs";
+import { MyFrogFrame, FrogProfileFrame } from "@/app/frames/[[...routes]]/frogs";
 import React from "react";
 
 const apollo = backendApolloClient({})
@@ -26,9 +26,9 @@ const app = new Frog({
     features: ['cast', 'interactor']
   })
 ).use(async (c, next) => {
-    try {
-      Object.keys(c.var).length && await apollo.mutate({
-          mutation: gql`
+  try {
+    Object.keys(c.var).length && await apollo.mutate({
+      mutation: gql`
               mutation FrameInteraction($frameUrl: String!, $interactionJson: String!) {
                   frameInteraction(frameUrl: $frameUrl, interactionJson: $interactionJson) {
                       ... on InteractionSuccess {
@@ -37,18 +37,18 @@ const app = new Frog({
                   }
               }
           `,
-        variables: {
-          frameUrl: c.req.url,
-          interactionJson: JSON.stringify(c.var)
-        }
-      })
-    } catch (e) {
-      console.error("analytics error", e)
-    }
+      variables: {
+        frameUrl: c.req.url,
+        interactionJson: JSON.stringify(c.var)
+      }
+    })
+  } catch (e) {
+    console.error("analytics error", e)
+  }
 
-    // FROG WHYYYYYY
-    // We have to manually replace all occurrences of http(s)://*:*/frames with process.env.NEXT_PUBLIC_URL/frames
-    // because frog is ignoring our origin config, idgi
+  // FROG WHYYYYYY
+  // We have to manually replace all occurrences of http(s)://*:*/frames with process.env.NEXT_PUBLIC_URL/frames
+  // because frog is ignoring our origin config, idgi
 
   await next()
   console.log(`Frame ${c.req.url} responded with ${c.res.status}`)
@@ -161,44 +161,46 @@ app.frame('/frog/mint', (f) => {
 
 app.frame("/frog/:id", async (c) => {
   const id = c.req.param('id')
-  const {frog, visitor} = await loadFrogForVisitor(id, c.var.interactor?.fid)
+  const { frog, visitor } = await loadFrogForVisitor(id, c.var.interactor?.fid)
   const refreshButton = <Button value="refresh" action={`/frog/${frog?.id}`}>Check Status</Button>
-  const intents = frog && visitor?.actionsAllowed ? (
-    frog.alive ? [
-      <Button value="feed" action={`/frog/${frog.id}/interact`}>🥗 Feed</Button>,
-      <Button value="play" action={`/frog/${frog.id}/interact`}>🎮 Play</Button>,
-      <Button value="hug" action={`/frog/${frog.id}/interact`}>💗 Hug</Button>,
-      refreshButton
-    ] : [
-      <Button value="mint" action={`/frog/${frog.id}/mint`}>🪙 Mint</Button>,
-    ]
-  ) : [refreshButton]
+  const intents = frog ?
+    frog.alive ? (
+      visitor?.actionsAllowed ? [
+        <Button value="feed" action={`/frog/${frog.id}/interact`}>🥗 Feed</Button>,
+        <Button value="play" action={`/frog/${frog.id}/interact`}>🎮 Play</Button>,
+        <Button value="hug" action={`/frog/${frog.id}/interact`}>💗 Hug</Button>,
+        refreshButton
+      ] : [refreshButton])
+      : [
+        <Button value="mint" action={`/frog/${frog.id}/mint`}>🪙 Mint</Button>,
+      ] : [refreshButton]
+
   console.log(visitor)
   return c.res({
     image: (frog?.alive ?
-        <FrogProfileFrame frog={frog} hideStats={!visitor?.user?.id}>
-          <div style={{display: "flex", fontSize: 40, marginBottom: 20}}>I am a {frog?.species}</div>
-          {visitor?.cooldownUntil ? (
-            <div style={{display: "flex", color: "white", fontSize: 30}}>
-              You can interact again in {Math.ceil(visitor.cooldownUntil / 60)} minutes.
-            </div>
-          ) : visitor?.actionsAllowed ? (
-            <div style={{display: "flex", color: "white", fontSize: 30}}>
-              Help take care of {frog?.owner?.firstName}'s frog!
-            </div>
-          ) : <></>}
-        </FrogProfileFrame>
-        : frog ? <FrogProfileFrame frog={frog}>
-          <div style={{display: "flex", flexDirection: "column", maxWidth: "500px", padding: "10px"}}>
-            <div style={{display: "flex", color: "white", marginBottom: "20px"}}>
-              ☠️ I&apos;m dead ☠️
-            </div>
-            <div style={{display: "flex", color: "white", fontSize: 30}}>
-              Mint a commemomorative NFT - all proceeds go towards the Rainforest Foundation.
-            </div>
-
+      <FrogProfileFrame frog={frog} hideStats={!visitor?.user?.id}>
+        <div style={{ display: "flex", fontSize: 40, marginBottom: 20 }}>I am a {frog?.species}</div>
+        {visitor?.cooldownUntil ? (
+          <div style={{ display: "flex", color: "white", fontSize: 30 }}>
+            You can interact again in {Math.ceil(visitor.cooldownUntil / 60)} minutes.
           </div>
-        </FrogProfileFrame> : <div style={{color: 'white'}}>Frog not found</div>
+        ) : visitor?.actionsAllowed ? (
+          <div style={{ display: "flex", color: "white", fontSize: 30 }}>
+            Help take care of {frog?.owner?.firstName}'s frog!
+          </div>
+        ) : <></>}
+      </FrogProfileFrame>
+      : frog ? <FrogProfileFrame frog={frog}>
+        <div style={{ display: "flex", flexDirection: "column", maxWidth: "500px", padding: "10px" }}>
+          <div style={{ display: "flex", color: "white", marginBottom: "20px" }}>
+            ☠️ I&apos;m dead ☠️
+          </div>
+          <div style={{ display: "flex", color: "white", fontSize: 30 }}>
+            Mint a commemomorative NFT - all proceeds go towards the Rainforest Foundation.
+          </div>
+
+        </div>
+      </FrogProfileFrame> : <div style={{ color: 'white' }}>Frog not found</div>
     ),
     intents
   })
@@ -206,60 +208,60 @@ app.frame("/frog/:id", async (c) => {
 
 app.frame("/frog/:id/interact", async (c) => {
   const id = c.req.param('id')
-  const {frog, visitor} = await loadFrogForVisitor(id, c.var.interactor?.fid)
-  const {buttonValue} = c
+  const { frog, visitor } = await loadFrogForVisitor(id, c.var.interactor?.fid)
+  const { buttonValue } = c
   return c.res({
     image: (
       frog ? buttonValue == "feed" ?
+        <FrogProfileFrame frog={frog}>
+          <div style={{ display: "flex", flexDirection: "column", maxWidth: "500px", padding: "10px" }}>
+            <div style={{ display: "flex", color: "white", marginBottom: "20px" }}>
+              Nom nom nom. Thank you!
+            </div>
+            <div style={{ display: "flex", color: "white", fontSize: 30 }}>
+              You can come back in 6 hours.
+            </div>
+
+          </div>
+        </FrogProfileFrame>
+
+        :
+        buttonValue == "play" ?
+
           <FrogProfileFrame frog={frog}>
-            <div style={{display: "flex", flexDirection: "column", maxWidth: "500px", padding: "10px"}}>
-              <div style={{display: "flex", color: "white", marginBottom: "20px"}}>
-                Nom nom nom. Thank you!
+            <div style={{ display: "flex", flexDirection: "column", maxWidth: "500px", padding: "10px" }}>
+              <div style={{ display: "flex", color: "white", marginBottom: "20px" }}>
+                Thanks for playing with me!
               </div>
-              <div style={{display: "flex", color: "white", fontSize: 30}}>
+              <div style={{ display: "flex", color: "white", fontSize: 30 }}>
                 You can come back in 6 hours.
               </div>
-
             </div>
           </FrogProfileFrame>
-
           :
-          buttonValue == "play" ?
+          buttonValue == "hug" ?
 
             <FrogProfileFrame frog={frog}>
-              <div style={{display: "flex", flexDirection: "column", maxWidth: "500px", padding: "10px"}}>
-                <div style={{display: "flex", color: "white", marginBottom: "20px"}}>
-                  Thanks for playing with me!
+              <div style={{ display: "flex", flexDirection: "column", maxWidth: "500px", padding: "10px" }}>
+                <div style={{ display: "flex", color: "white", marginBottom: "20px" }}>
+                  Thanks for the hug!
                 </div>
-                <div style={{display: "flex", color: "white", fontSize: 30}}>
+                <div style={{ display: "flex", color: "white", fontSize: 30 }}>
                   You can come back in 6 hours.
                 </div>
+
               </div>
             </FrogProfileFrame>
+
             :
-            buttonValue == "hug" ?
-
-              <FrogProfileFrame frog={frog}>
-                <div style={{display: "flex", flexDirection: "column", maxWidth: "500px", padding: "10px"}}>
-                  <div style={{display: "flex", color: "white", marginBottom: "20px"}}>
-                    Thanks for the hug!
-                  </div>
-                  <div style={{display: "flex", color: "white", fontSize: 30}}>
-                    You can come back in 6 hours.
-                  </div>
-
-                </div>
-              </FrogProfileFrame>
-
-              :
-              <div style={{color: 'white', display: 'flex', fontSize: 60}}>No Action</div>
-        : <div style={{color: 'white'}}>Frog not found</div>
+            <div style={{ color: 'white', display: 'flex', fontSize: 60 }}>No Action</div>
+        : <div style={{ color: 'white' }}>Frog not found</div>
     ),
 
   })
 })
 
-devtools(app, {serveStatic})
+devtools(app, { serveStatic })
 
 export const GET = handle(app)
 export const POST = handle(app)
