@@ -6,8 +6,8 @@ from regenfrogs.utils.graphql import define_query
 
 
 class Queries(object):
-    @define_query(graphene.Field(types.FrogProfile, id=graphene.String(required=True), fid=graphene.Int(required=True)))
-    def frog_for_visitor(self, info, id, fid):
+    @define_query(graphene.Field(types.FrogProfile, id=graphene.String(required=True), fid=graphene.Int()))
+    def frog_for_visitor(self, info, id, fid=None):
         from regenfrogs.apps.frogs.models import FrogProfile
 
         return FrogProfile.objects.get(pk=id)

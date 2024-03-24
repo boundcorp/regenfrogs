@@ -3,7 +3,7 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "dev": "next dev --port 1122",
+    "dev": "next dev --port 3000",
     "deploy": "vercel",
     "build": "next build",
     "start": "next start",

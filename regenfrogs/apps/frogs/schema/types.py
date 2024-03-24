@@ -9,7 +9,7 @@ class FrogProfile(DjangoObjectType):
 
     def resolve_image_url(self, info):
         if self.image and self.image.chosen_image:
-            return self.image.chosen_image.url
+            return self.image.ipfs_proxy_url
 
     class Meta:
         model = models.FrogProfile

@@ -11,7 +11,7 @@ from . import models
 
 @register(models.FrogProfile)
 class FrogProfileAdmin(ModelAdmin):
-    list_display = ["id", "get_image", "created_at", "lifespan", "age", "alive", "hunger", "health", "sanity"]
+    list_display = ["id", "get_image", "owner", "created_at", "lifespan", "age", "alive", "hunger", "health", "sanity"]
     search_fields = ["species", "user__username", "user__farcaster_id"]
     readonly_fields = [
         "image",

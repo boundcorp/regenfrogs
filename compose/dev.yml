@@ -117,10 +117,7 @@ services:
     command: "yarn dev"
     entrypoint: []
     working_dir: /app/frontend
-    expose: ["1122"]
-    links:
-      - psql
-      - minio
+    expose: ["3000"]
     volumes:
       - ../:/app
     user: "${UID_GID}"

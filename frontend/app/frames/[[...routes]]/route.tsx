@@ -8,6 +8,10 @@ import {neynar} from "frog/middlewares";
 import {fixUrls} from "@/src/urls";
 import {backendApolloClient} from "@/src/apollo-client";
 import {gql} from "@apollo/client";
+import {loadFrogForVisitor} from "@/src/frogs";
+import AdoptFrame from "@/app/frames/[[...routes]]/adopt";
+import {MyFrogFrame, FrogProfileFrame} from "@/app/frames/[[...routes]]/frogs";
+import React from "react";
 
 const apollo = backendApolloClient({})
 
@@ -37,7 +41,7 @@ const app = new Frog({
           frameUrl: c.req.url,
           interactionJson: JSON.stringify(c.var)
         }
-      }) && console.log("analytics ok", c.var.interactor?.fid)
+      })
     } catch (e) {
       console.error("analytics error", e)
     }
@@ -47,64 +51,14 @@ const app = new Frog({
     // because frog is ignoring our origin config, idgi
 
   await next()
+  console.log(`Frame ${c.req.url} responded with ${c.res.status}`)
   c.res = new Response(fixUrls(await c.res.text()), {
     headers: c.res.headers,
     status: c.res.status
   })
 })
 
-// Uncomment to use Edge Runtime
-// export const runtime = 'edge'
-
-type FrogProfile = {
-  alive: boolean
-  status: string
-  hunger: number
-  health: number
-  sanity: number
-  species: string
-
-}
-
-const LIVE_FROG: FrogProfile = {
-  alive: true,
-  status: "happy",
-  hunger: 90,
-  health: 85,
-  sanity: 100,
-  species: "Poison dart frog - Brightly colored with bold patterns like stripes, spots, or bands in combinations of black, blue, orange, or yellow"
-}
-const FROGS: Record<string, FrogProfile> = {
-  "1": LIVE_FROG
-}
-
-async function loadFrogForFid(fid: number | undefined) {
-  if (!fid) {
-    return null
-  }
-    try {
-      console.log("Frog for", fid)
-        const frogStatus = fid ? await apollo.query({
-            query: gql`
-                query frogByFid($fid: Int!) {
-                    frogByFid(fid: $fid) {
-                        ... on FrogProfile {
-                            imageUrl
-                            status
-                        }
-                    }
-                }
-            `,
-          variables: {fid}
-        }) : null
-      console.log("Your frog is", frogStatus?.data)
-    } catch (e) {
-      console.error("Error fetching frog status", e)
-    }
-}
-
 app.frame('/', async (f) => {
-  const myFrog = await loadFrogForFid(f.var.interactor?.fid)
   return f.res({
     image: (
       <div
@@ -158,163 +112,10 @@ app.frame('/', async (f) => {
   })
 })
 
-app.frame("/adopt", async (c) => {
-  const myFrog = await loadFrogForFid(c.var.interactor?.fid)
-  const {buttonValue, inputText, status} = c
-    if (buttonValue == "adopt") {
-      const adopted = await apollo.mutate({
-            mutation: gql`
-                mutation adoptFrog($fid: Int!) {
-                    adoptFrog(fid: $fid) {
-                        ... on AdoptFrogSuccess {
-                            frog {
-                                id
-                                species
-                                imageUrl
-                                owner {
-                                    id
-                                    username
-                                }
-                            }
-                        }
-                    }
-                }
-            `,
-          variables: {fid: c.var.interactor?.fid}
-        })
-        console.log("Adopted", JSON.stringify(adopted?.data?.frog))
-    }
-  return c.res({
-    image: (
-      <div
-        style={{
-          background:
-            status === 'response'
-              ? 'linear-gradient(to top left, #73a942, #538d22, #245501)'
-              : 'black',
-          backgroundSize: '100% 100%',
-          display: 'flex',
-          flexDirection: 'column',
-          flexWrap: 'nowrap',
-          height: '100%',
-          textAlign: 'left',
-          width: '100%',
-        }}
-      >
-        <div
-          style={{
-            color: 'white',
-            fontSize: 50,
-            fontStyle: 'normal',
-            letterSpacing: '-0.025em',
-            lineHeight: 1.4,
-            marginTop: 30,
-            padding: '0 120px',
-            whiteSpace: 'pre-wrap',
-          }}
-        >
-          🤗 1. Adopt a frog
-        </div>
 
-        <div
-          style={{
-            color: 'white',
-            fontSize: 50,
-            fontStyle: 'normal',
-            letterSpacing: '-0.025em',
-            lineHeight: 1.4,
-            marginTop: 30,
-            padding: '0 120px',
-            whiteSpace: 'pre-wrap',
-          }}>
-          🥗 2. You and friends feed your frog
-        </div>
+app.frame("/adopt", AdoptFrame)
+app.frame("/my-frog", MyFrogFrame)
 
-        <div
-          style={{
-            color: 'white',
-            fontSize: 50,
-            fontStyle: 'normal',
-            letterSpacing: '-0.025em',
-            lineHeight: 1.4,
-            marginTop: 30,
-            padding: '0 120px',
-            whiteSpace: 'pre-wrap',
-          }}>
-          ☠️ 3. Frog dies
-        </div>
-
-        <div style={{
-          color: 'white',
-          fontSize: 50,
-          fontStyle: 'normal',
-          letterSpacing: '-0.025em',
-          lineHeight: 1.4,
-          marginTop: 30,
-          padding: '0 120px',
-          whiteSpace: 'pre-wrap',
-        }}>
-          🖼️ 4. Mint a commemorative NFT
-        </div>
-
-        <div
-          style={{
-            color: 'white',
-            fontSize: 50,
-            fontStyle: 'normal',
-            letterSpacing: '-0.025em',
-            lineHeight: 1.4,
-            marginTop: 30,
-            padding: '0 120px',
-            whiteSpace: 'pre-wrap',
-          }}>
-          💸 5. All proceeds go directly to Rainforest Foundation
-        </div>
-      </div>
-    ),
-    intents: [
-      <Button value="adopt" action="/adopt">Adopt my Buddy</Button>,
-    ],
-  })
-})
-
-
-const DEATH_REASONS = ["Accidentally overdosed on virtual caffeine after drinking too many digital energy drinks",
-  "Got caught up in a heated debate with a virtual fly and forgot to eat",
-  "Attempted a daring escape from its virtual terrarium and got lost in the digital jungle",
-  "Fell victim to a virtual reality glitch that turned its surroundings into a pixelated mess",
-  "Engaged in a virtual rap battle with a rival frog and lost its voice from all the croaking",
-  "Tried to impress a virtual frog date with a risky skydiving stunt and landed on a pixelated cactus",
-  "Developed a sudden obsession with playing virtual video games and forgot to eat",
-  "Got into a virtual food fight with a group of mischievous digital squirrels and lost",
-  "Accidentally activated a self-destruct button while trying to unlock a secret level in its virtual habitat",
-  "Attempted to reenact scenes from a virtual action movie and ended up in a pixelated explosion",
-  "Fell asleep while binging on virtual reality TV and forgot to wake up for dinner",
-  "Engaged in a virtual dance-off with a rival frog and tripped over its own virtual feet",
-  "Tried to impress its virtual friends by attempting a dangerous stunt jump and landed in a virtual pond without water",
-  "Mistook a virtual hot dog for a virtual snake and attempted to eat it",
-  "Got distracted by a virtual rainbow and accidentally hopped off a virtual cliff",
-  "Developed a case of virtual stage fright during a virtual talent show and froze on stage",
-  "Attempted to prank its virtual owner by hiding in a virtual freezer and got frostbite",
-  "Got carried away while practicing its virtual yoga moves and twisted itself into a digital knot",
-  "Became a virtual superhero for a day and attempted to fly off a virtual building",
-  "Tried to break a virtual world record for the longest virtual hop and ran out of virtual energy halfway through",
-  "Developed a virtual addiction to playing virtual reality games and forgot to eat or sleep",
-  "Participated in a virtual cooking competition and accidentally ate its own virtual dish, which turned out to be toxic",
-  "Attempted to imitate a virtual ninja and got tangled in its own virtual ninja robe",
-  "Joined a virtual frog choir and croaked so loudly that it shattered its own virtual eardrums",
-  "Tried to impress its virtual crush by attempting a virtual magic trick and accidentally made itself disappear",
-  "Accepted a virtual dare to eat a virtual spicy pepper and suffered from a virtual case of indigestion",
-  "Fell victim to a virtual prank involving a virtual catapult and a virtual bucket of virtual water",
-  "Attempted to break the virtual world record for the longest virtual jump and overshot its landing, crashing into a virtual wall",
-  "Got into a virtual paintball battle with a group of virtual frogs and accidentally swallowed a virtual paintball",
-  "Became addicted to virtual reality shopping and spent all its virtual currency on virtual luxury items, forgetting to buy food"
-]
-
-function choose(choices = DEATH_REASONS) {
-  var index = Math.floor(Math.random() * choices.length);
-  return choices[index];
-}
 
 app.frame('/frog/mint', (f) => {
   return f.res({
@@ -346,7 +147,7 @@ app.frame('/frog/mint', (f) => {
             display: "flex"
           }}
         >
-          YOUR FROG DIED FROM {choose()}
+          YOUR FROG DIED
         </div>
 
       </div>
@@ -358,54 +159,32 @@ app.frame('/frog/mint', (f) => {
   })
 })
 
-app.frame("/frog/:id", (c) => {
+app.frame("/frog/:id", async (c) => {
   const id = c.req.param('id')
-  const frog = FROGS?.[id]
+  const frog = await loadFrogForVisitor(id, c.var.interactor?.fid)
+  const actionsAvailable = true;
+  const refreshButton = <Button value="refresh" action={`/frog/${frog?.id}`}>Refresh</Button>
+  const intents = frog && actionsAvailable ? [
+      <Button value="feed" action={`/frog/${frog.id}/interact`}>🥗 Feed</Button>,
+      <Button value="play" action={`/frog/${frog.id}/interact`}>🎮 Play</Button>,
+      <Button value="compliment" action={`/frog/${frog.id}/interact`}>👍 Compliment</Button>,
+      refreshButton
+  ] : [
+    refreshButton
+  ]
   return c.res({
     image: (
-      frog ? 
-      <div style={{color: 'white', display: 'flex', fontSize: 60}}>
-
-        <div style={{display: "flex",  width: "600px", height: "600px", border: "4px solid green", margin: "14px 10px 0" }}>
-          <img src="/images/regenfrogs-frog1.jpg" alt="Frog Image" style={{ maxWidth: "600px"}} />
-        </div>
-
-        <div style={{display: "flex", flexDirection: "column", maxWidth: "500px", padding: "10px"}}>
-          <div style={{display: "flex", color: "white", marginBottom: "20px"}}>
-            Congratulations
-          </div>
-          <div style={{display: "flex", flexWrap: "nowrap"}}>
-            <div style={{display: "flex", color: "white", fontSize: 30, marginBottom: "20px"}}>
-              You adopted a {frog.species}
-            </div>
-          </div>
-
-          <div style={{display: "flex", color: "white"}}>
-            Health: {frog.health}
-          </div>
-        
-          <div style={{display: "flex", color: "white"}}>
-            Hunger: {frog.hunger}
-          </div>
-
-          <div style={{display: "flex", color: "white"}}>
-            Sanity: {frog.sanity}
-          </div>
-
-        </div>
-      </div> : <div style={{color: 'white'}}>Frog not found</div>
+      <FrogProfileFrame frog={frog}>
+        Yisss
+      </FrogProfileFrame>
     ),
-    intents: [
-      <Button value="feed" action={`/frog/${id}/interact`}>🥗 Feed</Button>,
-      <Button value="play" action={`/frog/${id}/interact`}>🎮 Play</Button>,
-      <Button value="compliment" action={`/frog/${id}/interact`}>👍 Compliment</Button>,
-    ]
+    intents
   })
 })
 
-app.frame("/frog/:id/interact", (c) => {
+app.frame("/frog/:id/interact", async (c) => {
   const id = c.req.param('id')
-  const frog = FROGS?.[id]
+  const frog = await loadFrogForVisitor(id, c.var.interactor?.fid)
   const {buttonValue} = c
   return c.res({
     image: (

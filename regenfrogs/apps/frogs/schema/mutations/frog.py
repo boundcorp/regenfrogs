@@ -21,7 +21,7 @@ class AdoptFrog(graphene.Mutation):
     def mutate(self, info, fid):
         try:
             user = User.objects.get(farcaster_id=fid)
-            frog = FrogProfile.adopt_from_image(user)
+            frog = user.get_or_create_frog()
             return AdoptFrogSuccess(
                 frog=frog,
             )
